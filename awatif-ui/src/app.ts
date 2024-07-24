@@ -7,6 +7,7 @@ import { settings } from "./settings";
 import "./styles/viewer.css";
 import "./styles/settings.css";
 import "./styles/parameters.css";
+import "./styles/export.css";
 import { exportIfc } from "./exportIfc";
 
 export function app({
@@ -35,11 +36,11 @@ export function app({
   // update
   const viewerElement = viewer(modelState, settingsState);
   const settingElement = settings(model, settingsState);
-  
-  exportIfc(modelState);
+  const exportElement = exportIfc(modelState);
 
   document.body.appendChild(viewerElement);
   document.body.appendChild(settingElement);
+  document.body.appendChild(exportElement);
 
   // on parameter change
   if (parameterObj && onParameterChange) {

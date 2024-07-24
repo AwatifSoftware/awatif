@@ -29,5 +29,8 @@
     "awatif-ui",
     "examples",
     "website"
-  ]
+  ],
+  "dependencies": {
+    "vite": "^5.3.4"
+  }
 }

@@ -1,0 +1,19 @@
+.topBar a {
+    text-decoration: none;
+    color: white;
+    font-family: Arial;
+    background-color: #2e5368;
+    border: none;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    font-size: 12px;
+    font-family: Arial;
+    cursor: pointer;
+    border-radius: 12px;
+    transition: background-color 0.3s;
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    z-index: 3;
+}

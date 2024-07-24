@@ -2,9 +2,7 @@
 //TODO:: - What about levels? by default we are creating only one level and all elements are on it.
 
 import {IfcAPI, IFC4, Schemas} from "web-ifc";
-import { html, render } from "lit-html";
 import { ModelState } from "./types";
-import van from "vanjs-core";
 import {Vector3} from 'three';
 // import IfcStructuralPointConnection = IFC4.IfcStructuralPointConnection;
 
@@ -17,7 +15,7 @@ const connectionsMapByIndex  = new Map<number,number>(),
       membersMapByIndex      = new Map<number,number>(),
       IFCAPI                 = new IfcAPI();
 
-export const exportIfc = (model: ModelState): void => {
+export const exportIfc = (model: ModelState) => {
 
     // Events
     async function onTopBarExportIfcClick() {
@@ -51,15 +49,14 @@ export const exportIfc = (model: ModelState): void => {
         }
     }
 
-    van.derive( () => {
-        // init html
-        const topBarTemp = html`
-        <div class="topBar">
-            <a @click=${onTopBarExportIfcClick} href="#exportIfc">Export IFC</a>
-        </div>`;
-
-        render( html`${topBarTemp}`, document.body );
-    });
+    const div = document.createElement('div');
+    div.className = "topBar";
+    let a = document.createElement('a');
+    a.href = "#exportIfc";
+    a.textContent = "Export IFC";
+    a.addEventListener('click', onTopBarExportIfcClick);
+    div.appendChild(a);
+    return div;
 };
 
 type CShape = {
