@@ -159,7 +159,6 @@ const runExport = async (
     
     try {
         await setupIfcBasis();
-        
         const structuralModel = createStructuralModel(name);
         createPointConnections(nodes);
         createCurveMembers(elements);
@@ -227,7 +226,7 @@ const setupIfcBasis = async (): Promise<void> => {
     //* Units 
     const unit_1 = new IFC4.IfcSIUnit(
         IFC4.IfcUnitEnum.LENGTHUNIT,
-        null,
+        IFC4.IfcSIPrefix.MILLI,
         IFC4.IfcSIUnitName.METRE
     );
 
@@ -355,19 +354,20 @@ const createIfcSpatialStructure = (): void => {
 //* Structural model
 const createPointConnections = (nodes: Array<number>[]): void => {
     for (let i = 0; i < nodes.length; i++) {
-        let connection = generateConnection(nodes[i]);
+        let connection = generateConnection(nodes[i], i);
         connectionsMapByIndex.set(i, connection.expressID);
         IFCAPI.WriteLine(modelId, connection);
     }
 } 
 
-const generateConnection = (position: number[]): IFC4.IfcStructuralPointConnection => {
+const generateConnection = (position: number[], index: number): IFC4.IfcStructuralPointConnection => {
 
+    const factor = 1000; // hard coded for now from m to mm
     //* IFCCARTESIANPOINT
     const point = new IFC4.IfcCartesianPoint([
-        new IFC4.IfcLengthMeasure(position[0]),
-        new IFC4.IfcLengthMeasure(position[1]),
-        new IFC4.IfcLengthMeasure(position[2])
+        new IFC4.IfcLengthMeasure(position[0] * factor),
+        new IFC4.IfcLengthMeasure(position[1] * factor),
+        new IFC4.IfcLengthMeasure(position[2] * factor)
     ])
 
     //* IFCVERTEXPOINT
@@ -389,17 +389,20 @@ const generateConnection = (position: number[]): IFC4.IfcStructuralPointConnecti
 
     //* IFCBOUNDARYNODECONDITION
     const boundCondition = new IFC4.IfcBoundaryNodeCondition(
-        new IFC4.IfcLabel('Fixed'),
-        null, null, null, null, null, null
+        // new IFC4.IfcLabel('Fixed'),
+        null, 
+        new IFC4.IfcBoolean('T'), new IFC4.IfcBoolean('T'),
+        new IFC4.IfcBoolean('T'), new IFC4.IfcBoolean('T'),
+        new IFC4.IfcBoolean('T'), new IFC4.IfcBoolean('T')
     )
 
     //* IFCSTRUCTURALPOINTCONNECTION
     const connection = new IFC4.IfcStructuralPointConnection(
         generateIfcGUID(),
         null,
-        new IFC4.IfcLabel(''),
+        new IFC4.IfcLabel(`${index+1}`),
         new IFC4.IfcText(''),
-        null,null,
+        null, null,
         productDefShape,
         boundCondition,
         null
@@ -411,7 +414,7 @@ const generateConnection = (position: number[]): IFC4.IfcStructuralPointConnecti
 
 const createCurveMembers = (elements: Array<number>[]): void => {
     for (let i = 0; i < elements.length; i++){
-        let member = generateMember(elements[i]);
+        let member = generateMember(elements[i], i);
         if (member){
             membersMapByIndex.set(i, member.expressID);
             IFCAPI.WriteLine(modelId, member);
@@ -419,7 +422,7 @@ const createCurveMembers = (elements: Array<number>[]): void => {
     }
 }
 
-const generateMember = (element: number[]) => {
+const generateMember = (element: number[], index: number) => {
 
     let connexIdx1 = connectionsMapByIndex.get(element[0]);
     let connexIdx2 = connectionsMapByIndex.get(element[1]);
@@ -439,13 +442,22 @@ const generateMember = (element: number[]) => {
     const coord2 = IFCAPI.GetLine(modelId, p2.VertexGeometry.value).Coordinates;
     const v1 = new Vector3(coord1[0].value, coord1[1].value, coord1[2].value)
     const v2 = new Vector3(coord2[0].value, coord2[1].value, coord2[2].value)
-    let dir = new Vector3();
-    dir.subVectors( v2, v1 ).normalize();
+
+    let d = v1.multiply(v2).normalize();
+
+    if (v1.length() == 0)
+        d = new Vector3(1,1,1).multiply(v2).normalize();
+    else if (v2.length() == 0) 
+        d = new Vector3(1,1,1).multiply(v1).normalize();
+
+    console.log('[Vectors]:', v1, v2)
+    console.log('[Mult]:', d)
+
 
     const direction = new IFC4.IfcDirection( [
-        new IFC4.IfcLengthMeasure(dir.x),
-        new IFC4.IfcLengthMeasure(dir.y),
-        new IFC4.IfcLengthMeasure(dir.z),
+        new IFC4.IfcLengthMeasure(d.x),
+        new IFC4.IfcLengthMeasure(d.y),
+        new IFC4.IfcLengthMeasure(d.z)
     ]);
 
     const edge = new IFC4.IfcEdge(p1, p2);
@@ -464,7 +476,7 @@ const generateMember = (element: number[]) => {
     const member = new IFC4.IfcStructuralCurveMember(
         generateIfcGUID(),
         null,
-        new IFC4.IfcLabel(''),
+        new IFC4.IfcLabel(`${index+1}`),
         new IFC4.IfcText(''),
         null,
         null,
