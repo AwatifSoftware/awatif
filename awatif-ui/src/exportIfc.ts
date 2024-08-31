@@ -44,7 +44,7 @@ export const exportIfc = (model: ModelState) => {
             let blob = new Blob([binData], {type: 'application/x-step'});
             let a = document.createElement('a');
             a.href = URL.createObjectURL(blob);
-            a.download = "test_31_08.ifc";
+            a.download = "model.ifc";
             a.click();
         }
     }
