@@ -44,7 +44,7 @@ export const exportIfc = (model: ModelState) => {
             let blob = new Blob([binData], {type: 'application/x-step'});
             let a = document.createElement('a');
             a.href = URL.createObjectURL(blob);
-            a.download = "model.ifc";
+            a.download = "test_31_08.ifc";
             a.click();
         }
     }
@@ -443,21 +443,17 @@ const generateMember = (element: number[], index: number) => {
     const v1 = new Vector3(coord1[0].value, coord1[1].value, coord1[2].value)
     const v2 = new Vector3(coord2[0].value, coord2[1].value, coord2[2].value)
 
-    let d = v1.multiply(v2).normalize();
+    let dd = new Vector3().subVectors(v1.clone(), v2.clone()).normalize();
 
-    if (v1.length() == 0)
-        d = new Vector3(1,1,1).multiply(v2).normalize();
-    else if (v2.length() == 0) 
-        d = new Vector3(1,1,1).multiply(v1).normalize();
-
-    console.log('[Vectors]:', v1, v2)
-    console.log('[Mult]:', d)
-
+    const dir = new Vector3();
+    if (Math.abs(dd.x) > 0) dir.z = 1;
+    if (Math.abs(dd.y) > 0) dir.z = 1;
+    if (Math.abs(dd.z) > 0) dir.x = 1;
 
     const direction = new IFC4.IfcDirection( [
-        new IFC4.IfcLengthMeasure(d.x),
-        new IFC4.IfcLengthMeasure(d.y),
-        new IFC4.IfcLengthMeasure(d.z)
+        new IFC4.IfcLengthMeasure(dir.x),
+        new IFC4.IfcLengthMeasure(dir.y),
+        new IFC4.IfcLengthMeasure(dir.z)
     ]);
 
     const edge = new IFC4.IfcEdge(p1, p2);
