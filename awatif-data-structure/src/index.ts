@@ -2,7 +2,7 @@ import { State } from "vanjs-core";
 
 // The geometry of any structure can be represented by these two entities:
 export type Node = [number, number, number]; // position coordinates [x,y,z]
-export type Element = number[]; // indices of the first and second node in the list of nodes
+export type Element = [number, number]; // indices of the first and second node in the list of nodes
 
 // Analysis Inputs
 export type AnalysisInputs = {
@@ -16,9 +16,10 @@ export type AnalysisInputs = {
 };
 
 export type MaterialInput = {
-  elasticity: number;
-  shearModulus?: number;
-  mass?: number;
+  elasticity: number; // Young's modulus E
+  shearModulus?: number; // Shear modulus G
+  poisson?: number; // Poisson's ratio ν
+  density?: number; // Material density (optional)
 };
 
 export type SectionInput = {
@@ -26,6 +27,7 @@ export type SectionInput = {
   momentOfInertiaZ?: number;
   momentOfInertiaY?: number;
   torsionalConstant?: number;
+  thickness?: number; // Plate thickness t
 };
 
 // Analysis Outputs
