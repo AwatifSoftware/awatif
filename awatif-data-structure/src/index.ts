@@ -4,6 +4,13 @@ import { State } from "vanjs-core";
 export type Node = [number, number, number]; // position coordinates [x,y,z]
 export type Element = [number, number]; // indices of the first and second node in the list of nodes
 
+/**
+ * Represents a Gauss point in 2D natural coordinate space.
+ * Used for numerical integration in finite element analysis.
+ * @type [xi, eta]
+ */
+export type GaussPoint2D = [number, number];
+
 // Analysis Inputs
 export type AnalysisInputs = {
   materials?: Map<number, MaterialInput>;
