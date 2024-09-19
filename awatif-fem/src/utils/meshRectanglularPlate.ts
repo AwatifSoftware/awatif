@@ -7,7 +7,9 @@ export function meshRectangularPlate(
   B: number,
   Nx: number,
   Ny: number,
-): { coordinates: Node[]; elements: QuadrilateralElement[] } {
+): { coordinates: Node[]; elements: QuadrilateralElement[];
+  nel: number;
+  nnode: number; } {
   // Total number of elements
   const nel = Nx * Ny;
   const nnel = 4; // Number of nodes per element
@@ -50,5 +52,5 @@ export function meshRectangularPlate(
     }
   }
 
-  return { coordinates, elements };
+  return { coordinates, elements, nel, nnode };
 }
