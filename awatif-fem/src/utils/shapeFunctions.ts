@@ -1,4 +1,3 @@
-import { GaussPoint2D } from 'awatif-data-structure';
 
 export interface ShapeFunctionResults {
     shape: number[];        // Shape functions [N1, N2, N3, N4]
