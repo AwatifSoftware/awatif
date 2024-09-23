@@ -13,7 +13,7 @@ describe('calculateGlobalStiffnessMatrix', () => {
 
     // The problem is for a rectangular plate with 2x2 elements and 4 nodes per element.
     // Each node has 3 degrees of freedom (w, thetax, thetay), so the global stiffness matrix
-    // should have a size of (12, 12) for 4 nodes * 3 DOF = 12 DOF.
+    // should have a size of (27, 27) for 4 nodes * 3 DOF = 27 DOF.
     const expectedSize = 27;
 
     // Check the dimensions of the global stiffness matrix (whether it's a math.Matrix or an array)

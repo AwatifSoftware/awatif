@@ -12,7 +12,7 @@ export function meshRectangularPlate(
   nnode: number;  } {
   // Total number of elements
   const nel = Nx * Ny;
-  const nnel = 4; // Number of nodes per element
+
 
   // Number of points along length and breadth
   const npx = Nx + 1;
