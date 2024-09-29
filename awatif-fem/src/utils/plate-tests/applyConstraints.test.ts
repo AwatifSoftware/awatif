@@ -1,4 +1,4 @@
-import { applyConstraints } from '../applyConstraints';
+import { applyConstraints } from '../plates/applyConstraints';
 
 test('applyConstraints modifies kk and ff correctly', () => {
   // Initial matrices

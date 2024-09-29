@@ -1,4 +1,4 @@
-import { plateShear } from '../plateShear';
+import { plateShear } from '../plates/plateShear';
 
 test('plateShear computes the correct kinematic matrix for shear', () => {
   const nnel = 2;

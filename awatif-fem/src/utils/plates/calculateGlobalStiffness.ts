@@ -28,11 +28,13 @@ export function calculateGlobalStiffnessMatrix(): math.Matrix {
   const G = 0.5 * E / (1 + nu);
 
   // Number of mesh elements in x and y directions
-  const Nx = 10;
-  const Ny = 10;
+  const Nx = 2;
+  const Ny = 2;
 
   // Generate mesh
   const { coordinates, elements, nel, nnode } = meshRectangularPlate(a, b, Nx, Ny);
+  console.log(coordinates);
+  console.log(elements);
 
   // Number of nodes per element and degrees of freedom
   const nnel = 4; // Quadrilateral element
@@ -58,7 +60,7 @@ export function calculateGlobalStiffnessMatrix(): math.Matrix {
       E,
       nu,
       t,
-      G
+      
     );
 
     // Map local DOFs to global DOFs using elementDOF
@@ -72,7 +74,6 @@ export function calculateGlobalStiffnessMatrix(): math.Matrix {
 
     // Convert the assembled stiffnessArray back to math.Matrix after modification
     stiffness = math.matrix(stiffnessArray);
-    console.log("test1")
   }
 
   // Return the global stiffness matrix

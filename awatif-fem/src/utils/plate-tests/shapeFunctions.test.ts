@@ -1,7 +1,7 @@
 // tests/shapeFunctions.test.ts
 
-import { shapeFunctions } from '../shapeFunctions';
-import { ShapeFunctionResults } from '../shapeFunctions';
+import { shapeFunctions } from '../plates/shapeFunctions';
+import { ShapeFunctionResults } from '../plates/shapeFunctions';
 
 describe('shapeFunctions', () => {
     /**

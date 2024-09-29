@@ -21,7 +21,6 @@ import { plateShear } from './plateShear';
  * @param E - Elastic modulus.
  * @param nu - Poisson's ratio.
  * @param t - Plate thickness.
- * @param G - Shear modulus.
  * @returns The element stiffness matrix `ke`.
  */
 export function calculateElementStiffness(
@@ -31,15 +30,17 @@ export function calculateElementStiffness(
   coordinates: number[][],
   E: number,
   nu: number,
-  t: number,
-  G: number
+  t: number
 ): math.Matrix {
+  // Shear modulus
+  const G = E / (2 * (1 + nu));
+
   // Shear correction factor
   const shcof = 5 / 6;
 
-  // Material matrices
+  // Material matrices (without thickness factors)
   const D_pb = math.multiply(
-    (E * t ** 3) / (12 * (1 - nu ** 2)),
+    E / (1 - nu ** 2),
     math.matrix([
       [1, nu, 0],
       [nu, 1, 0],
@@ -47,7 +48,7 @@ export function calculateElementStiffness(
     ])
   ) as math.Matrix;
 
-  const D_ps = math.multiply(G * t * shcof, math.identity(2)) as math.Matrix;
+  const D_ps = math.multiply(G * shcof, math.identity(2)) as math.Matrix;
 
   // Gauss quadrature for bending
   const resultBending: GaussQuadratureResult = gaussQuadrature('second');
@@ -98,12 +99,17 @@ export function calculateElementStiffness(
     // Kinematic matrix for bending
     const B_pb = plateBending(nnel, dshapedx, dshapedy);
 
-    // Compute and accumulate kb
+    // Compute and accumulate kb (include thickness factor t^3 / 12)
     const B_pb_T = math.transpose(B_pb);
-    const kbIncrement = math.multiply(
-      math.multiply(math.multiply(B_pb_T, D_pb), B_pb),
-      wt * detjacobian
+    const stiffnessMatrix = math.multiply(
+      math.multiply(B_pb_T, D_pb),
+      B_pb
     ) as math.Matrix;
+    const kbIncrement = math.multiply(
+      stiffnessMatrix,
+      (t ** 3 / 12) * wt * detjacobian
+    ) as math.Matrix;
+
     kb = math.add(kb, kbIncrement) as math.Matrix;
   }
 
@@ -114,7 +120,7 @@ export function calculateElementStiffness(
     const wt = resultShear.gaussWeights[int];
 
     // Shape functions and derivatives
-    const { dshapedxi, dshapedeta } = shapeFunctions(xi, eta);
+    const { shape, dshapedxi, dshapedeta } = shapeFunctions(xi, eta);
 
     // Jacobian and inverse
     const { detjacobian, invjacobian } = computeJacobian(
@@ -133,15 +139,20 @@ export function calculateElementStiffness(
       invjacobian
     );
 
-    // Kinematic matrix for shear
-    const B_ps = plateShear(nnel, dshapedx, dshapedy, dshapedxi);
+    // Kinematic matrix for shear (use 'shape' instead of 'dshapedxi')
+    const B_ps = plateShear(nnel, dshapedx, dshapedy, shape);
 
-    // Compute and accumulate ks
+    // Compute and accumulate ks (include thickness factor t)
     const B_ps_T = math.transpose(B_ps);
-    const ksIncrement = math.multiply(
-      math.multiply(math.multiply(B_ps_T, D_ps), B_ps),
-      wt * detjacobian
+    const stiffnessMatrix = math.multiply(
+      math.multiply(B_ps_T, D_ps),
+      B_ps
     ) as math.Matrix;
+    const ksIncrement = math.multiply(
+      stiffnessMatrix,
+      t * wt * detjacobian
+    ) as math.Matrix;
+
     ks = math.add(ks, ksIncrement) as math.Matrix;
   }
 

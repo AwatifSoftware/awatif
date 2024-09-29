@@ -1,6 +1,6 @@
 // computeElementForce.test.ts
 
-import { computeElementForce } from '../computeElementForce';
+import { computeElementForce } from '../plates/computeElementForce';
 
 describe('computeElementForce', () => {
   test('computes correct element force vector for uniform shape functions and pressure', () => {

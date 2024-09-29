@@ -1,4 +1,4 @@
-import { computeJacobian } from '../computeJacobian';
+import { computeJacobian } from '../plates/computeJacobian';
 
 test('jacobian function computes correct determinant and inverse', () => {
   const nnel = 4;

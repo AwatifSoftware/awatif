@@ -1,4 +1,4 @@
-import { plateBending } from '../plateBending';
+import { plateBending } from '../plates/plateBending';
 
 test('plateBending computes the correct kinematic matrix for bending', () => {
   const nnel = 2;

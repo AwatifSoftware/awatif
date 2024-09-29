@@ -1,7 +1,7 @@
 // tests/BoundaryCondition.test.ts
 
-import { meshRectangularPlate } from "../meshRectanglularPlate";
-import { boundaryCondition } from "../boundaryCondition";
+import { meshRectangularPlate } from "../plates/meshRectanglularPlate";
+import { boundaryCondition } from "../plates/boundaryCondition";
 
 
 describe("BoundaryCondition Function", () => {

@@ -1,4 +1,4 @@
-import { gaussQuadrature, GaussQuadratureResult } from '../gaussQuadrature';
+import { gaussQuadrature, GaussQuadratureResult } from '../plates/gaussQuadrature';
 import { GaussPoint2D } from 'awatif-data-structure';
 
 describe('gaussQuadrature', () => {

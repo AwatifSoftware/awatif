@@ -1,5 +1,5 @@
 import { create, all, MathJsStatic } from 'mathjs';
-import { calculateGlobalStiffnessMatrix } from '../calculateGlobalStiffness';
+import { calculateGlobalStiffnessMatrix } from '../plates/calculateGlobalStiffness';
 
 // Initialize MathJS
 const math: MathJsStatic = create(all);

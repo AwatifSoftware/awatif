@@ -1,4 +1,4 @@
-import { shapeFunctionDerivatives } from '../shapeFunctionDerivatives';
+import { shapeFunctionDerivatives } from '../plates/shapeFunctionDerivatives';
 
 test('shapeFunctionDerivatives computes correct derivatives', () => {
  
