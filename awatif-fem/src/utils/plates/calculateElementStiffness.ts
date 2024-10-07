@@ -10,6 +10,8 @@ import { computeJacobian } from './computeJacobian';
 import { shapeFunctionDerivatives } from './shapeFunctionDerivatives';
 import { plateBending } from './plateBending';
 import { plateShear } from './plateShear';
+import { computeElementForce } from "./computeElementForce"
+
 
 /**
  * Calculates the element stiffness matrix for a given element.
@@ -31,7 +33,7 @@ export function calculateElementStiffness(
   E: number,
   nu: number,
   t: number
-): math.Matrix {
+):{ updatedF:  number[], ke: math.Matrix }  {
   // Shear modulus
   const G = E / (2 * (1 + nu));
 
@@ -69,6 +71,7 @@ export function calculateElementStiffness(
   // Initialize element matrices
   let kb = math.zeros(edof, edof) as math.Matrix; // Bending stiffness matrix
   let ks = math.zeros(edof, edof) as math.Matrix; // Shear stiffness matrix
+  let f = math.zeros([edof, 1]) as math.Matrix;  //  Force vector
 
   // Numerical integration for bending stiffness
   for (let int = 0; int < resultBending.gaussPoints.length; int++) {
@@ -119,6 +122,7 @@ export function calculateElementStiffness(
     const eta = resultShear.gaussPoints[int][1];
     const wt = resultShear.gaussWeights[int];
 
+
     // Shape functions and derivatives
     const { shape, dshapedxi, dshapedeta } = shapeFunctions(xi, eta);
 
@@ -154,10 +158,24 @@ export function calculateElementStiffness(
     ) as math.Matrix;
 
     ks = math.add(ks, ksIncrement) as math.Matrix;
+
+    let fe = computeElementForce(nnel,shape,-1) ;             
+    
+            
+    const scaleFactor = wt * detjacobian; // Calculate the scalar multiplication factor
+    const scaledFe = math.multiply(fe, scaleFactor); // Scale fe by the factor
+    f = math.add(f, scaledFe); // Accumulate force vector
   }
 
   // Total element stiffness matrix
   const ke = math.add(kb, ks) as math.Matrix;
 
-  return ke;
+  // Extract values from the matrix and map to an array
+  // Extract the values manually
+
+
+// Convert the matrix to a regular array
+let fArray: number[] = (f.valueOf() as number[][]).map(row => row[0]);
+
+  return { updatedF: fArray, ke };
 }

@@ -1,6 +1,6 @@
 // elementDOF.test.ts
 
-import { elementDOF } from '../elementDOF';
+import { elementDOF } from '../plates/elementDOF';
 import { QuadrilateralElement } from 'awatif-data-structure';
 
 describe('elementDOF', () => {

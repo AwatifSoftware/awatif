@@ -5,8 +5,7 @@ import {
   AnalysisOutputs,
 } from "awatif-data-structure";
 import { deform } from "./deformPlate";
-import { getTransformationMatrix } from "./utils/getTransformationMatrix";
-import { getStiffness } from "./utils/getStiffnes";
+
 import { multiply, norm, subset, subtract, index } from "mathjs";
 
 export function analyze(
