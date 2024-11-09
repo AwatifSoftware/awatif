@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Awatif UI - Layout</title>
+    <script type="module">
+      import { layout } from "./layout";
+
+      const topLeft = document.createElement("span");
+      const topRight = document.createElement("span");
+      const main = document.createElement("span");
+      const preview = document.createElement("span");
+      const right = document.createElement("span");
+
+      topLeft.innerText = "Top Left";
+      topRight.innerText = "Top Right";
+      main.innerText = "Main";
+      preview.innerText = "Preview";
+      right.innerText = "Right";
+
+      const layoutElm = layout({ topLeft, topRight, main, preview, right });
+
+      document.body.appendChild(layoutElm);
+    </script>
+  </head>
+  <body></body>
+</html>
