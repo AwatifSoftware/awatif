@@ -20,6 +20,7 @@
     "url": "https://github.com/madil4/awatif"
   },
   "dependencies": {
+    "lit-html": "^3.2.1",
     "vanjs-core": "^1.5.2"
   }
 }

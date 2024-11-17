@@ -14,6 +14,7 @@ export type Structure = {
   analyzeOutputs?: State<AnalyzeOutputs>;
 };
 
+// Analytical Model
 // The geometry of any structure can be represented by these two entities:
 export type Node = [number, number, number]; // position coordinates [x,y,z]
 export type Element = number[]; // indices of the first and second node in the list of nodes
