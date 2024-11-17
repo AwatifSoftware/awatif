@@ -2,14 +2,7 @@ import { State } from "vanjs-core";
 
 // The geometry of any structure can be represented by these two entities:
 export type Node = [number, number, number]; // position coordinates [x,y,z]
-export type Element = [number, number]; // indices of the first and second node in the list of nodes
-
-/**
- * Represents a Gauss point in 2D natural coordinate space.
- * Used for numerical integration in finite element analysis.
- * @type [xi, eta]
- */
-export type GaussPoint2D = [number, number];
+export type Element = number[]; // indices of the first and second node in the list of nodes
 
 // Analysis Inputs
 export type AnalysisInputs = {
@@ -43,7 +36,7 @@ export type AnalysisOutputs = {
   elements?: Map<number, ElementAnalysisOutputs>;
 };
 
-type NodeAnalysisOutputs = {
+export type NodeAnalysisOutputs = {
   deformation?: [number, number, number, number, number, number];
   reaction?: [number, number, number, number, number, number];
 };
