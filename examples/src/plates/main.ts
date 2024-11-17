@@ -1,9 +1,11 @@
+
 import { app } from "awatif-ui";
 import { calculateGlobalStiffnessMatrix } from 'awatif-fem/src/utils/plates/calculateGlobalStiffness';
 import { meshRectangularPlate } from "awatif-fem/src/utils/plates/meshRectanglularPlate";
 import { boundaryCondition } from "awatif-fem/src/utils/plates/boundaryCondition"
 import {applyConstraints} from "awatif-fem/src/utils/plates/applyConstraints"
 import {solveDisplacement} from "awatif-fem/src/utils/plates/solveDisplacement"
+
 
 
 app({ settings: { deformedShape: true } });
@@ -16,8 +18,8 @@ const E = 10920; // Elastic modulus
 const nu = 0.3;  // Poisson's ratio
 const t = 0.1;   // Plate thickness
 // Number of mesh elements in x and y directions
-const Nx = 15;
-const Ny = 15;
+const Nx = 2;
+const Ny = 2;
 
 
 
@@ -50,9 +52,6 @@ console.log('Constrained boundaries:', constrainedDOFs);
 
 
 
-
-
-
 console.log("Initial Stiffness Matrix:");
 console.log(result.stiffness.toString()); // Print initial stiffness matrix
 
@@ -70,7 +69,7 @@ console.log(result.force); // Print modified force vector
 
 
   // Solve for displacement
-  const displacement = solveDisplacement(result.stiffness, result.force);
+  const displacement = solveDisplacement(result.stiffness, result.force, nnode);
 
   console.log('Displacement Vector:');
   console.log(displacement.toString()); // Print the displacement vector
