@@ -1,15 +1,13 @@
-import { Node, QuadrilateralElement } from "awatif-data-structure";
-
-
+import { Node, Element } from "awatif-data-structure";
 
 export function meshRectangularPlate(
   L: number,
   B: number,
   Nx: number,
-  Ny: number,
+  Ny: number
 ): {
   coordinates: Node[];
-  elements: QuadrilateralElement[];
+  elements: Element[];
   nel: number;
   nnode: number;
 } {
@@ -56,7 +54,7 @@ export function meshRectangularPlate(
   }
 
   // Generate element connectivity matching MATLAB's node ordering
-  const elements: QuadrilateralElement[] = [];
+  const elements: Element[] = [];
   for (let i = 0; i < npx - 1; i++) {
     for (let j = 0; j < npy - 1; j++) {
       const n1 = NodeNo[j][i];
