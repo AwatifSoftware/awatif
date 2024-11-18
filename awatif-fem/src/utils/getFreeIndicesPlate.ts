@@ -1,9 +1,9 @@
-import { AnalysisInputs, QuadrilateralElement } from "awatif-data-structure";
+import { AnalysisInputs, Element } from "awatif-data-structure";
 
 export function getFreeIndices(
   supportsInputs: AnalysisInputs["pointSupports"],
   sectionInputs: AnalysisInputs["sections"],
-  elements: QuadrilateralElement[],
+  elements: Element[],
   dof: number
 ): number[] {
   const supportsIndexes: number[] = [];

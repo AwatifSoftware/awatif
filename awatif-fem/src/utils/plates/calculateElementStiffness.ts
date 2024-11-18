@@ -3,7 +3,7 @@ import { create, all, MathJsStatic } from 'mathjs';
 // Initialize MathJS
 const math: MathJsStatic = create(all);
 
-import { QuadrilateralElement } from 'awatif-data-structure';
+import { Element } from 'awatif-data-structure';
 import { GaussQuadratureResult, gaussQuadrature } from './gaussQuadrature';
 import { shapeFunctions } from './shapeFunctions';
 import { computeJacobian } from './computeJacobian';
@@ -28,11 +28,12 @@ import { computeElementForce } from "./computeElementForce"
 export function calculateElementStiffness(
   nnel: number,
   edof: number,
-  elementNodes: QuadrilateralElement,
+  elementNodes: Element,
   coordinates: number[][],
   E: number,
   nu: number,
-  t: number
+  t: number,
+  P: number
 ):{ updatedF:  number[], ke: math.Matrix }  {
   // Shear modulus
   const G = E / (2 * (1 + nu));
@@ -159,7 +160,7 @@ export function calculateElementStiffness(
 
     ks = math.add(ks, ksIncrement) as math.Matrix;
 
-    let fe = computeElementForce(nnel,shape,-1) ;             
+    let fe = computeElementForce(nnel,shape,P) ;             
     
             
     const scaleFactor = wt * detjacobian; // Calculate the scalar multiplication factor

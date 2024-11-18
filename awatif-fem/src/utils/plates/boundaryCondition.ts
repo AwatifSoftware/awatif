@@ -5,13 +5,11 @@ import { Node } from "awatif-data-structure";
  *
  * @param typeBC - String indicating the boundary condition type (e.g., 'ss-ss-ss-ss', 'c-c-c-c').
  * @param coordinates - Array of nodes, where each node is [x, y, z].
- * @param loadStep - The current load step number.
  * @returns An array of constrained DOF indices.
  */
 export function boundaryCondition(
   typeBC: string,
-  coordinates: Node[],
-  loadStep: number
+  coordinates: Node[]
 ): number[] {
   // Extract x and y coordinates
   const xCoordinates = coordinates.map(coord => coord[0]);
@@ -49,9 +47,7 @@ export function boundaryCondition(
 
   switch (typeBC) {
     case 'ss-ss-ss-ss':
-      if (loadStep === 1) {
-        console.log('Plate is simply supported at all the edges');
-      }
+      
 
       const dofSS: number[] = [];
 
@@ -76,9 +72,7 @@ export function boundaryCondition(
       return bcdofSS;
 
     case 'c-c-c-c':
-      if (loadStep === 1) {
-        console.log('Plate is clamped at all the edges');
-      }
+  
 
       const dofCC: number[] = [];
 

@@ -3,10 +3,9 @@ import { create, all, MathJsStatic } from 'mathjs';
 // Initialize MathJS
 const math: MathJsStatic = create(all);
 
-import { QuadrilateralElement } from 'awatif-data-structure';
+import { Element } from 'awatif-data-structure';
 
 // Import helper functions
-import { meshRectangularPlate } from './meshRectanglularPlate';
 import { elementDOF } from './elementDOF';
 import { assemble } from './assemble2D';
 
@@ -27,12 +26,13 @@ import { calculateElementStiffness } from './calculateElementStiffness';
  */
 export function calculateGlobalStiffnessMatrix(
   coordinates: number[][],
-  elements: QuadrilateralElement[],
+  elements: Element[],
   nel: number,
   nnode: number,
   E: number,
   nu: number,
-  t: number
+  t: number,
+  P: number
 ): { stiffness: math.Matrix, force: number[] } {
   // Geometrical and material properties are passed as parameters.
 
@@ -45,7 +45,6 @@ export function calculateGlobalStiffnessMatrix(
   const ndof = 3; // Degrees of freedom per node (w, thetax, thetay)
   const sdof = nnode * ndof; // Total system DOFs
   const edof = nnel * ndof;  // Degrees of freedom per element
-  console.log(sdof);
 
   // Initialize global stiffness matrix and force vector
   let stiffness = math.zeros(sdof, sdof) as math.Matrix;
@@ -54,7 +53,7 @@ export function calculateGlobalStiffnessMatrix(
   // Loop over all elements
   for (let iel = 0; iel < nel; iel++) {
     // Extract node indices for the current element
-    const elementNodes: QuadrilateralElement = elements[iel];
+    const elementNodes: Element = elements[iel];
 
     // Calculate element stiffness matrix and force vector
     let { updatedF: f, ke } = calculateElementStiffness(
@@ -64,7 +63,8 @@ export function calculateGlobalStiffnessMatrix(
       coordinates,
       E,
       nu,
-      t
+      t,
+      P
     );
 
     // Map local DOFs to global DOFs using elementDOF

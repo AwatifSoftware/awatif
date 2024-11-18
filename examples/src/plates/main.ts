@@ -17,7 +17,7 @@ const analysisOutputs: State<AnalysisOutputs> = van.state({});
 const params: Parameters = {
   width: { value: van.state(10), min: 0, max: 25 },
   breath: { value: van.state(5), min: 0, max: 25 },
-  load: { value: van.state(0), min: 0, max: 500 },
+  load: { value: van.state(0), min: -5, max: 5 },
 };
 
 // visualize the rectangular mesh
@@ -27,8 +27,9 @@ van.derive(() => {
   const E = 10920; // Elastic modulus
   const nu = 0.3; // Poisson's ratio
   const t = 0.1; // Plate thickness
-  const Nx = 5;
-  const Ny = 5;
+  const Nx = 8;
+  const Ny = 8;
+  const load = params.load.value.val;
   const {
     coordinates: quadNodes,
     elements: quadElements,
@@ -48,13 +49,14 @@ van.derive(() => {
     nnode,
     E,
     nu,
-    t
+    t,
+    load
   );
 
   // supports
-  const typeBC = "ss-ss-ss-ss";
-  const loadStep = 1;
-  const constrainedDOFs = boundaryCondition(typeBC, quadNodes, loadStep);
+  const typeBC = "c-c-c-c";
+ 
+  const constrainedDOFs = boundaryCondition(typeBC, quadNodes);
 
   // Apply constraints
   applyConstraints(stiffness, force, constrainedDOFs);
