@@ -1,4 +1,4 @@
-import{w as z,v as p,b as D,c as b,B as C,x as h,d as y,e as I,L as S,f as _,g as H,F as B,a as V}from"./styles-ZbCYhIuB.js";function E({fields:e,data:o,onChange:t}){const l=document.createElement("div"),i=new z({name:Math.random().toString().substring(2),box:l,selectType:"cell",recordHeight:26,show:{columnMenu:!1,lineNumbers:!0},columns:G(e),records:x(o.rawVal,e)});return l.setAttribute("id","grid"),new ResizeObserver(()=>i.refresh()).observe(l),i.onChange=n=>{if(!e[n.detail.column])return;const a=w[n.detail.column];i.records[n.detail.index][a]=n.detail.value.new,t&&t(g(i.records,e))},i.onDelete=n=>{n.detail.force=!0,n.onComplete=()=>{t&&t(g(i.records,e))}},i.onPaste=n=>{n.onComplete=()=>{i.mergeChanges(),t&&t(g(i.records,e))}},p.derive(()=>{i.records=x(o.val,e),i.refresh()}),l}const w="ABCDEFGHIJKLMNOPRST";function G(e){return w.split("").map(t=>({field:t,text:'<div style="text-align: center">'+t+"</div>",size:"90px",resizable:!0,sortable:!0,editable:{type:"text"}})).map(t=>{const l=e.find(i=>i.field===t.field);return l?{...t,...l}:t})}function x(e,o){const t=Array.isArray(e)?e:r(e,o),l=Array(50).fill(0).map((n,a)=>({recid:a})),i=w.split("");for(let n=0;n<t.length;n++)for(let a=0;a<t[n].length;a++)l[n][i[a]]=t[n][a];return l;function r(n,a){const s=new Map;return a.forEach(c=>s.set(c.field,c)),Object.keys(n).map(c=>[s.get(c).text,n[c]])}}function g(e,o){if(w.includes(o[0].field))return l(e,o);return i(e,o);function l(r,n){let a=[...Array(r.length)].map(()=>[...Array(n.length)]);const s=w.split("");for(let u=0;u<a.length;u++)for(let d=0;d<a[u].length;d++)a[u][d]=r[u][s[d]]??"";return a.slice(0,c(a)+1);function c(u){for(let d=u.length-1;d>=0;d--)if(u[d].some(L=>L!==""))return d}}function i(r,n){return Object.fromEntries(n.map(({field:a},s)=>[a,r[s].B]))}}function j({sheets:e,onChange:o}){const t=document.createElement("div"),l=document.createElement("div"),i=[],r=new Map;e.forEach((s,c)=>{i.push({id:c,text:s.text}),r.set(c,E({fields:s.fields,data:s.data,onChange:a}))});const n=new D({box:l,name:"tabs",active:i[0].id,flow:"up",tabs:i});t.id="sheets",l.id="tabs",t.append(r.values().next().value,l),n.onClick=s=>{t.firstChild.replaceWith(r.get(s.target))};function a(s){o&&o({sheet:n.active,data:s})}return t}function O({topLeft:e,topRight:o,main:t,preview:l,right:i}){const r=document.createElement("div"),n="border: 1px solid #efefef",a=new b({name:"topLayout",panels:[...e?[{type:"left",size:"50%",html:f(e.element)}]:[],...o?[{type:"right",size:"50%",html:f(o.element)}]:[]]});return new b({box:r,name:"layout",panels:[...e||o?[{type:"top",size:60,style:n,html:a}]:[],{type:"main",style:n,html:f(t.element),...t.title?{title:t.title}:{}},...l?[{type:"preview",size:"50%",resizable:!0,style:n,html:f(l.element),...l.title?{title:l.title}:{}}]:[],...i?[{type:"right",size:"65%",resizable:!0,style:n,html:f(i.element),...i.title?{title:i.title}:{}}]:[]]}),r.id="layout",r}function f(e){return{render:function(){this.box.append(e)}}}function T(e){const o=document.createElement("div"),t=h`<svg
+import{w as z,v as p,b as I,c as b,B as C,x as h,d as y,e as S,L as H,f as _,g as B,F as D,a as V}from"./styles-CfAimGmv.js";function E({fields:e,data:l,onChange:t}){const o=document.createElement("div"),i=new z({name:Math.random().toString().substring(2),box:o,selectType:"cell",recordHeight:26,show:{columnMenu:!1,lineNumbers:!0},columns:j(e),records:x(l.rawVal,e)});return o.setAttribute("id","grid"),new ResizeObserver(()=>i.refresh()).observe(o),i.onChange=n=>{if(!e[n.detail.column])return;const r=w[n.detail.column];i.records[n.detail.index][r]=n.detail.value.new,t&&t(g(i.records,e))},i.onDelete=n=>{n.detail.force=!0,n.onComplete=()=>{t&&t(g(i.records,e))}},i.onPaste=n=>{n.onComplete=()=>{i.mergeChanges(),t&&t(g(i.records,e))}},p.derive(()=>{i.records=x(l.val,e),i.refresh()}),o}const w="ABCDEFGHIJKLMNOPRST";function j(e){return w.split("").map(t=>({field:t,text:'<div style="text-align: center">'+t+"</div>",size:"90px",resizable:!0,sortable:!0,editable:{type:"text"}})).map(t=>{const o=e.find(i=>i.field===t.field);return o?{...t,...o}:t})}function x(e,l){const t=Array.isArray(e)?e:a(e,l),o=Array(50).fill(0).map((n,r)=>({recid:r})),i=w.split("");for(let n=0;n<t.length;n++)for(let r=0;r<t[n].length;r++)o[n][i[r]]=t[n][r];return o;function a(n,r){const s=new Map;return r.forEach(c=>s.set(c.field,c)),Object.keys(n).map(c=>[s.get(c).text,n[c]])}}function g(e,l){if(w.includes(l[0].field))return o(e,l);return i(e,l);function o(a,n){let r=[...Array(a.length)].map(()=>[...Array(n.length)]);const s=w.split("");for(let u=0;u<r.length;u++)for(let d=0;d<r[u].length;d++)r[u][d]=a[u][s[d]]??"";return r.slice(0,c(r)+1);function c(u){for(let d=u.length-1;d>=0;d--)if(u[d].some(L=>L!==""))return d}}function i(a,n){return Object.fromEntries(n.map(({field:r},s)=>[r,a[s].B]))}}function G({sheets:e,onChange:l}){const t=document.createElement("div"),o=document.createElement("div"),i=[],a=new Map;e.forEach((s,c)=>{i.push({id:c,text:s.text}),a.set(c,E({fields:s.fields,data:s.data,onChange:r}))});const n=new I({box:o,name:"tabs",active:i[0].id,flow:"up",tabs:i});t.id="sheets",o.id="tabs",t.append(a.values().next().value,o),n.onClick=s=>{t.firstChild.replaceWith(a.get(s.target))};function r(s){l&&l({sheet:n.active,data:s})}return t}function O({topLeft:e,topRight:l,main:t,preview:o,right:i}){const a=document.createElement("div"),n="border: 1px solid #efefef",r=new b({name:"topLayout",panels:[...e?[{type:"left",size:"50%",html:f(e.element)}]:[],...l?[{type:"right",size:"50%",html:f(l.element)}]:[]]});return new b({box:a,name:"layout",panels:[...e||l?[{type:"top",size:60,style:n,html:r}]:[],{type:"main",style:n,html:f(t.element),...t.title?{title:t.title}:{}},...o?[{type:"preview",size:"50%",resizable:!0,style:n,html:f(o.element),...o.title?{title:o.title}:{}}]:[],...i?[{type:"right",size:"65%",resizable:!0,style:n,html:f(i.element),...i.title?{title:i.title}:{}}]:[]]}),a.id="layout",a}function f(e){return{render:function(){this.box.append(e)}}}function T(e){const l=document.createElement("div"),t=h`<svg
       class="flex-shrink-0 size-7"
       xmlns="http://www.w3.org/2000/svg"
       width="40"
@@ -14,7 +14,7 @@ import{w as z,v as p,b as D,c as b,B as C,x as h,d as y,e as I,L as S,f as _,g a
       ></path>
     </svg>
 
-    <h1>${e}</h1>`;return o.id="title",C(t,o),o}function X({getStarted:e,author:o}){const t=document.createElement("div"),l=h` <ul>
+    <h1>${e}</h1>`;return l.id="title",C(t,l),l}function $({getStarted:e,author:l}){const t=document.createElement("div"),o=h` <ul>
     <li>
       <div class="popup">
         <button>Get started</button>
@@ -24,27 +24,27 @@ import{w as z,v as p,b as D,c as b,B as C,x as h,d as y,e as I,L as S,f as _,g a
     <li>
       <div class="popup">
         <button>Author</button>
-        <div>${o}</div>
+        <div>${l}</div>
       </div>
     </li>
     <li class="tooltip" data-tooltip="Awatif Newsletter">
       <a
         href="https://awatif.us19.list-manage.com/subscribe?u=80eec59eb329b1c9c00258524&id=95cfe71596"
         target="_blank"
-        >${P}</a
+        >${F}</a
       >
     </li>
     <li class="tooltip" data-tooltip="Awatif LinkedIn Page">
       <a href="https://www.linkedin.com/company/awatifsoftware" target="_blank"
-        >${$}</a
+        >${P}</a
       >
     </li>
     <li class="tooltip" data-tooltip="Awatif GitHub Project">
       <a href="https://github.com/madil4/awatif" target="_blank"
-        >${N}</a
+        >${q}</a
       >
     </li>
-  </ul>`;return t.id="marketing",C(l,t),t.querySelectorAll(".tooltip").forEach((i,r)=>{i.addEventListener("mouseenter",()=>{y.show({html:i.getAttribute("data-tooltip"),name:"custom-"+r,anchor:i})}),i.addEventListener("mouseleave",()=>{y.hide("custom-"+r)})}),t.querySelectorAll(".popup").forEach(i=>{i.addEventListener("click",()=>{var r,n;I.open({title:(r=i.querySelector("button"))==null?void 0:r.textContent,body:(n=i.querySelector("div"))==null?void 0:n.outerHTML,width:600,height:450})})}),t}const $=h`<svg
+  </ul>`;return t.id="marketing",C(o,t),t.querySelectorAll(".tooltip").forEach((i,a)=>{i.addEventListener("mouseenter",()=>{y.show({html:i.getAttribute("data-tooltip"),name:"custom-"+a,anchor:i})}),i.addEventListener("mouseleave",()=>{y.hide("custom-"+a)})}),t.querySelectorAll(".popup").forEach(i=>{i.addEventListener("click",()=>{var a,n;S.open({title:(a=i.querySelector("button"))==null?void 0:a.textContent,body:(n=i.querySelector("div"))==null?void 0:n.outerHTML,width:600,height:450})})}),t}const P=h`<svg
   xmlns="http://www.w3.org/2000/svg"
   xmlns:xlink="http://www.w3.org/1999/xlink"
   fill="#000000"
@@ -67,7 +67,7 @@ import{w as z,v as p,b as D,c as b,B as C,x as h,d as y,e as I,L as S,f as _,g a
       d="M230.454,94.761c-24.995,0-43.472,10.745-54.679,22.954V104.73c0-2.761-2.238-5-5-5h-59.599   c-2.762,0-5,2.239-5,5v199.928c0,2.762,2.238,5,5,5h62.097c2.762,0,5-2.238,5-5v-98.918c0-33.333,9.054-46.319,32.29-46.319   c25.306,0,27.317,20.818,27.317,48.034v97.204c0,2.762,2.238,5,5,5H305c2.762,0,5-2.238,5-5V194.995   C310,145.43,300.549,94.761,230.454,94.761z"
     />
   </g>
-</svg>`,N=h`<svg
+</svg>`,q=h`<svg
   xmlns="http://www.w3.org/2000/svg"
   xmlns:xlink="http://www.w3.org/1999/xlink"
   viewBox="0 0 20 20"
@@ -83,7 +83,7 @@ import{w as z,v as p,b as D,c as b,B as C,x as h,d as y,e as I,L as S,f as _,g a
       </g>
     </g>
   </g>
-</svg>`,P=h`<svg
+</svg>`,F=h`<svg
   xmlns="http://www.w3.org/2000/svg"
   fill="#000000"
   viewBox="0 0 20 20"
@@ -91,19 +91,17 @@ import{w as z,v as p,b as D,c as b,B as C,x as h,d as y,e as I,L as S,f as _,g a
   <path
     d="M18 3H2a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1V4a1 1 0 0 0-1-1zM4 10h6v1H4v-1zm8 4H4v-1h8v1zm5-6h-3V5h3v3z"
   />
-</svg>`,m=p.state([[0,0,0],[5,0,5],[10,0,0]]),M=p.state([]),k=new S(new _,new H),v=p.state([k]),A=new Map;A.set("polyline",{text:"Polyline",fields:[{field:"A",text:"X-coordinate",min:"25",editable:{type:"float"}},{field:"B",text:"Y-coordinate",editable:{type:"float"}},{field:"C",text:"Z-coordinate",editable:{type:"float"}}],data:m});const q=({data:e})=>m.val=e;p.derive(()=>{k.geometry.setAttribute("position",new B(m.val.flat(),3)),v.val=[...v.rawVal]});p.derive(()=>{const e=[];for(let o=0;o<m.val.length-1;o++)e.push([F(m.rawVal[o],m.rawVal[o+1]).toFixed(2),`${o+1} - ${o+2}`]);M.val=e});document.body.append(O({topLeft:{element:T("App Example")},topRight:{element:X({getStarted:Z(),author:R()})},main:{element:j({sheets:A,onChange:q}),title:"Inputs"},preview:{element:E({fields:[{field:"A",text:"Line Length"},{field:"B",text:"Between"}],data:M}),title:"Outputs"},right:{element:V({objects3D:v})}}));function F(e,o){return Math.sqrt(Math.pow(o[0]-e[0],2)+Math.pow(o[1]-e[1],2)+Math.pow(o[2]-e[2],2))}function Z(){return h`<p>
-      In this short video you will learn why we build the app and how to use it:
-    </p>
+</svg>`,m=p.state([[0,0,0],[5,0,5],[10,0,0]]),M=p.state([]),k=new H(new _,new B),v=p.state([k]),A=new Map;A.set("polyline",{text:"Polyline",fields:[{field:"A",text:"X-coordinate",min:"25",editable:{type:"float"}},{field:"B",text:"Y-coordinate",editable:{type:"float"}},{field:"C",text:"Z-coordinate",editable:{type:"float"}}],data:m});const X=({data:e})=>m.val=e;p.derive(()=>{k.geometry.setAttribute("position",new D(m.val.flat(),3)),v.val=[...v.rawVal]});p.derive(()=>{const e=[];for(let l=0;l<m.val.length-1;l++)e.push([N(m.rawVal[l],m.rawVal[l+1]).toFixed(2),`${l+1} - ${l+2}`]);M.val=e});document.body.append(O({topLeft:{element:T("Sheets Example")},topRight:{element:$({getStarted:R(),author:W()})},main:{element:G({sheets:A,onChange:X}),title:"Inputs"},preview:{element:E({fields:[{field:"A",text:"Line Length"},{field:"B",text:"Between"}],data:M}),title:"Outputs"},right:{element:V({objects3D:v})}}));function N(e,l){return Math.sqrt(Math.pow(l[0]-e[0],2)+Math.pow(l[1]-e[1],2)+Math.pow(l[2]-e[2],2))}function R(){return h`<p>In this video you will learn why we build this platform:</p>
     <iframe
       width="560"
       height="315"
-      src="https://www.youtube.com/embed/SDsDUmGxNXo?si=37wdyNkapXZcaDsD"
+      src="https://www.youtube.com/embed/hHQiSyCfIeA?si=tD5DmVvki1uJxU4i"
       title="YouTube video player"
       frameborder="0"
       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
       referrerpolicy="strict-origin-when-cross-origin"
       allowfullscreen
-    ></iframe>`}function R(){return h`<p style="line-height: 1.6">
+    ></iframe>`}function W(){return h`<p style="line-height: 1.6">
       Hi, I'm Mohamed Adil, a passionate structural engineer and software
       developer based in Amsterdam, with extensive experience in both fields.
       While working on the design of high-rise buildings, I realized that the
@@ -125,5 +123,5 @@ import{w as z,v as p,b as D,c as b,B as C,x as h,d as y,e as I,L as S,f as _,g a
     <img
       width="200"
       height="200"
-      src="https://awatif.co/img/automate/mohamed.jpg"
+      src="https://awatif.co/img/services/mohamed.jpg"
     /> `}

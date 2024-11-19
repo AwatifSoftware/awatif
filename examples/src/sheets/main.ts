@@ -64,7 +64,7 @@ van.derive(() => {
 
 document.body.append(
   layout({
-    topLeft: { element: title("App Example") },
+    topLeft: { element: title("Sheets Example") },
     topRight: {
       element: marketing({
         getStarted: getGetStartedHtml(),
@@ -99,13 +99,11 @@ function getLength(point1: number[], point2: number[]): number {
 }
 
 function getGetStartedHtml(): TemplateResult {
-  return html`<p>
-      In this short video you will learn why we build the app and how to use it:
-    </p>
+  return html`<p>In this video you will learn why we build this platform:</p>
     <iframe
       width="560"
       height="315"
-      src="https://www.youtube.com/embed/SDsDUmGxNXo?si=37wdyNkapXZcaDsD"
+      src="https://www.youtube.com/embed/hHQiSyCfIeA?si=tD5DmVvki1uJxU4i"
       title="YouTube video player"
       frameborder="0"
       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
@@ -137,6 +135,6 @@ function getAuthorHtml(): TemplateResult {
     <img
       width="200"
       height="200"
-      src="https://awatif.co/img/automate/mohamed.jpg"
+      src="https://awatif.co/img/services/mohamed.jpg"
     /> `;
 }
