@@ -1,4 +1,5 @@
 export type { Parameters } from "./parameters/parameters";
+export type { Drawing } from "./viewer/drawing/drawing";
 
 export { viewer } from "./viewer/viewer";
 export { parameters } from "./parameters/parameters";

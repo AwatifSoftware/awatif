@@ -18,6 +18,7 @@ import { elementResults } from "./objects/elementResults";
 import { nodeResults } from "./objects/nodeResults";
 
 import "./styles.css";
+import { drawing, Drawing } from "./drawing/drawing";
 
 export type SettingsObj = {
   gridSize?: number;
@@ -39,10 +40,12 @@ export function viewer({
   structure,
   settingsObj,
   objects3D,
+  drawingObj,
 }: {
   structure?: Structure;
   settingsObj?: SettingsObj;
   objects3D?: State<THREE.Object3D[]>;
+  drawingObj?: Drawing;
 }): HTMLDivElement {
   // init
   THREE.Object3D.DEFAULT_UP = new THREE.Vector3(0, 0, 1);
@@ -81,6 +84,17 @@ export function viewer({
   });
 
   // update
+  if (drawingObj)
+    drawing({
+      drawingObj,
+      scene,
+      camera,
+      renderer,
+      gridSize: settings.gridSize.rawVal,
+      controls,
+      derivedDisplayScale,
+    });
+
   viewerElm.setAttribute("id", "viewer");
   viewerElm.appendChild(renderer.domElement);
 

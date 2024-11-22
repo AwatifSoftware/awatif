@@ -23,6 +23,7 @@ export default defineConfig({
         truss: "src/truss/index.html",
         sheets: "src/sheets/index.html",
         "2d-mesh": "src/2d-mesh/index.html",
+        "draw-points": "src/draw-points/index.html",
       },
     },
   },
