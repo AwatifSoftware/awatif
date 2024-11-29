@@ -102,6 +102,7 @@ export function drawing({
     raycaster.setFromCamera(pointer, camera);
     const intersect = raycaster.intersectObject(plane);
 
+    console.log("delete");
     indicationPoint.geometry.deleteAttribute("position"); // delete point if not intersection
 
     if (intersect.length) {
@@ -109,9 +110,9 @@ export function drawing({
         "position",
         new THREE.Float32BufferAttribute(intersect[0].point.toArray(), 3)
       );
-
-      renderer.render(scene, camera);
     }
+
+    renderer.render(scene, camera);
   });
 
   // On pointer drag and intersection with a point update point position
