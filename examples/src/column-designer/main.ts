@@ -19,10 +19,9 @@ const slabInputs = van.state([
 ]);
 
 const globalInputs = van.state([
-  ["pinned", 0.8, 1.3],
-]);
+  ["pinned", 0.8, 1.3, "GL28h"]]);
 
-const outputLines = van.state([]);
+const designResults = van.state([]);
 const lines = new THREE.Line(
   new THREE.BufferGeometry(),
   new THREE.LineBasicMaterial()
@@ -37,11 +36,11 @@ sheetsObj.set("global-Param", {
     { field: "A", text: "Support", editable: { type: "string" } },
     { field: "B", text: "kmod", editable: { type: "float" } },
     { field: "C", text: "gamma", editable: { type: "float" } },
+    { field: "D", text: "Grade", editable: { type: "float" } },
+
   ],
   data: globalInputs,
 });
-
-// console.log(slabInputs.val[0])
 
 // global inputs
 sheetsObj.set("slab-Inputs", {
@@ -55,7 +54,7 @@ sheetsObj.set("slab-Inputs", {
 
 // design inputs
 sheetsObj.set("design-Inputs", {
-  text: "Inputs",
+  text: "Columns",
   fields: [
     { field: "A", text: "Column", editable: { type: "string" } },
     { field: "B", text: "Length", editable: { type: "float" } },
@@ -71,34 +70,35 @@ sheetsObj.set("design-Inputs", {
 });
 
 // events
-
 const onSheetChange = ({ data }) => (designInputs.val = data);
-// console.log(globalInputs.val[0][0])
+const noCols = designInputs.val.length
 
-var support = globalInputs.val[0][0] as SupportType
-var length = designInputs.val[0][1] as number
-var width = designInputs.val[0][2] as number
-var height = designInputs.val[0][3] as number
-var N_ed = designInputs.val[0][4] as number
-var M_yd = designInputs.val[0][5] as number
-var M_zd = designInputs.val[0][6] as number
-var f_c0k = 28
-var f_myk = 28
-var f_mzk = 28
-var E_modulus = 9500
-var G_05 = 5000
-var k_mod = globalInputs.val[0][1] as number
-var gamma = globalInputs.val[0][2] as number
+van.derive(() => {
 
+  const results = [];
+  for (let i = 0; i < noCols; i++) {
 
+    var support = globalInputs.val[0][0] as SupportType
+    var length = designInputs.val[i][1] as number
+    var width = designInputs.val[i][2] as number
+    var height = designInputs.val[i][3] as number
+    var N_ed = designInputs.val[i][4] as number
+    var M_yd = designInputs.val[i][5] as number
+    var M_zd = designInputs.val[i][6] as number
+    var f_c0k = 28
+    var f_myk = 28
+    var f_mzk = 28
+    var E_modulus = 9500
+    var G_05 = 720
+    var k_mod = globalInputs.val[0][1] as number
+    var gamma = globalInputs.val[0][2] as number
 
-console.log(length)
+    const outputResults = timberColumnDesign(support, length, width, height, N_ed, M_yd, M_zd, f_c0k, f_myk, f_mzk, E_modulus, G_05, k_mod, gamma)
+    results.push(outputResults);
+  }
+  designResults.val = results;
 
-// const outputResults = designInputs.map((input) => Object.values(timberColumnDesign(globalInputs[0][0], 8000, 300, 100000, 1000,  5000, 4000, 24, 28, 34, 1200, 500, 0.9, 1.3)))
-// console.log(slabInputs.value);
-const outputResults = timberColumnDesign(support, length*1000, width, height, N_ed, M_yd, M_zd, f_c0k, f_myk, f_mzk, E_modulus, G_05, k_mod, gamma)
-console.log(  [outputResults.slendernessY, outputResults.slendernessZ, outputResults.utilizationY, outputResults.utilizationZ]);
-
+});
 
 document.body.append(
   layout({
@@ -116,12 +116,12 @@ document.body.append(
     preview: {
       element: grid({
         fields: [
-          { field: "A", text: "λy", type: "number"},
-          { field: "B", text: "λz", type: "number" },
-          { field: "C", text: "ηy", type: "number" },
-          { field: "D", text: "ηz", type: "number" },
+          { field: "A", text: "λy"},
+          { field: "B", text: "λz"},
+          { field: "C", text: "ηy"},
+          { field: "D", text: "ηz"},
         ],
-        data: outputResults.slendernessY,
+        data: designResults,
       }),
       title: "Outputs",
     },

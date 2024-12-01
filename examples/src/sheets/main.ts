@@ -61,6 +61,7 @@ van.derive(() => {
 
   outputLines.val = lengths;
 });
+console.log(outputLines)
 
 document.body.append(
   layout({

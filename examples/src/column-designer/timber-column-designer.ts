@@ -1,3 +1,5 @@
+import van from "vanjs-core";
+
 // Define a type for support conditions
 export type SupportType = 'pinned' | 'cantilever' | 'fixed (top)' | 'fixed (bottom)';
 
@@ -19,9 +21,12 @@ export function timberColumnDesign(
   gamma: number           // partial safety factor
 ) {
   // Geometry
-  const area = width * height;
-  const sectionModulusY = (width * Math.pow(height, 2)) / 6;
-  const sectionModulusZ = (height * Math.pow(width, 2)) / 6;
+  const widthh = width * 1000
+  const heightt = height * 1000
+
+  const area = widthh * heightt;
+  const sectionModulusY = (widthh * Math.pow(heightt, 2)) / 6;
+  const sectionModulusZ = (heightt * Math.pow(widthh, 2)) / 6;
 
   // Effective length coefficient based on support type
   const betaValues: { [key in SupportType]: number } = {
@@ -45,7 +50,8 @@ export function timberColumnDesign(
   const slendernessZ = effectiveLength / radiusOfGyrationZ;
 
   // Compressive stress
-  const sigma_cd = N_ed / area;
+  const sigma_cd = 1000 * N_ed / area;
+  console.log(sigma_cd)
 
   // Bending stresses
   const sigma_mdY = M_yd / sectionModulusY;
@@ -56,13 +62,15 @@ export function timberColumnDesign(
   const utilizationZ = sigma_cd / f_c0d + sigma_mdZ / f_mzd;
 
   // Check results
-  return {
-    slendernessY: slendernessY.toFixed(2),
-    slendernessZ: slendernessZ.toFixed(2),
-    utilizationY: utilizationY.toFixed(2),
-    utilizationZ: utilizationZ.toFixed(2),
-    // safe: utilizationY <= 1 && utilizationZ <= 1
-  };
+
+  const results = [
+    slendernessY.toFixed(1),
+    slendernessZ.toFixed(1),
+    utilizationY.toFixed(2),
+    utilizationZ.toFixed(2),
+  ];
+
+  return results;
 }
 
 // Example usage:
