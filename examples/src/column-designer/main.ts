@@ -4,18 +4,26 @@ import { sheets, viewer, layout, title, grid, marketing } from "awatif-ui";
 import { html, TemplateResult } from "lit-html";
 import { timberColumnDesign, SupportType } from "./timber-column-designer";
 
-
 // init
 const designInputs = van.state([
-  ["Col1", 4.2, 0.4, 0.4, 2000, 10, 15, 5, 5],
-  ["Col2", 4.2, 0.5, 0.5, 3000, 20, 25, 15, 15],
-  ["Col3", 4.2, 0.6, 0.6, 4000, 30, 35, 25, 25],
+  ["Col1", 4.2, 0.4, 0.4, 2000, 10, 15, 1.0, 1.0],
+  ["Col2", 4.2, 0.5, 0.5, 3000, 20, 25, 1.0, 8.25],
+  ["Col3", 4.2, 0.6, 0.6, 4000, 30, 35, 1.0, 16],
+  ["Col4", 4.2, 0.6, 0.6, 4000, 30, 35, 8.25, 1.0],
+  ["Col5", 4.2, 0.6, 0.6, 4000, 30, 35, 16, 1.0],
+  ["Col6", 4.2, 0.6, 0.6, 4000, 30, 35, 16, 16],
+  ["Col7", 4.2, 0.6, 0.6, 4000, 30, 35, 16, 8.25],
+  ["Col8", 4.2, 0.6, 0.6, 4000, 30, 35, 8.25, 16],
+  ["Col9", 4.2, 0.6, 0.6, 4000, 30, 35, 8.25, 8.25],
+
 ]);
 
 const slabInputs = van.state([
-  [10, 10],
-  [10, 20],
-  [10, 30],
+  [0.5, 0.5, 0],
+  [16.5, 0.5, 0],
+  [16.5, 16.5, 0],
+  [0.5, 16.5, 0],
+  [0.5, 0.5, 0],
 ]);
 
 const globalInputs = van.state([
@@ -26,7 +34,14 @@ const lines = new THREE.Line(
   new THREE.BufferGeometry(),
   new THREE.LineBasicMaterial()
 );
-const objects3D = van.state([lines]);
+
+const points = new THREE.Points(
+  new THREE.BufferGeometry(),
+  new THREE.PointsMaterial({
+  })
+);
+
+const objects3D = van.state([lines, points]);
 const sheetsObj = new Map();
 
 // global inputs
@@ -63,8 +78,8 @@ sheetsObj.set("design-Inputs", {
     { field: "E", text: "Ned", editable: { type: "int" } },
     { field: "F", text: "Myd", editable: { type: "int" } },
     { field: "G", text: "Mzd", editable: { type: "int" } },
-    { field: "H", text: "xCord", editable: { type: "int" } },
-    { field: "I", text: "yCord", editable: { type: "int" } },
+    { field: "H", text: "xCord", editable: { type: "float" } },
+    { field: "I", text: "yCord", editable: { type: "float" } },
   ],
   data: designInputs,
 });
@@ -97,8 +112,38 @@ van.derive(() => {
     results.push(outputResults);
   }
   designResults.val = results;
-
 });
+
+console.log(designInputs[0])
+
+// on inputPolyline change: render lines
+const xyCoords = [];
+for (let i = 0; i < noCols; i++) {
+  xyCoords.push(designInputs.val[i][7], designInputs.val[i][8], 0)
+}
+
+van.derive(() => {
+
+  //lines
+  lines.geometry.setAttribute(
+    "position",
+    new THREE.Float32BufferAttribute(slabInputs.val.flat(), 3)
+  );
+  // lines.material.color.set(0x00ff00); // Green lines
+
+  //points
+  const positions = xyCoords.flat();
+  console.log(positions)
+  points.geometry.setAttribute(
+    "position",
+    new THREE.Float32BufferAttribute(positions, 3)
+  );
+  points.material.size = 1; // Larger points
+  points.material.color.set(0xff0000); // Red points
+
+  objects3D.val = [...objects3D.rawVal]; // trigger rendering
+});
+
 
 document.body.append(
   layout({
@@ -116,10 +161,11 @@ document.body.append(
     preview: {
       element: grid({
         fields: [
-          { field: "A", text: "λy"},
-          { field: "B", text: "λz"},
-          { field: "C", text: "ηy"},
-          { field: "D", text: "ηz"},
+          { field: "A", text: "Column"},
+          { field: "B", text: "λy"},
+          { field: "C", text: "λz"},
+          { field: "D", text: "ηy"},
+          { field: "E", text: "ηz"},
         ],
         data: designResults,
       }),
