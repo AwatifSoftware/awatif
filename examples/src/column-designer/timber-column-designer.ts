@@ -29,6 +29,10 @@ export function timberColumnDesign(
   const sectionModulusY = (widthh * Math.pow(heightt, 2)) / 6;
   const sectionModulusZ = (heightt * Math.pow(widthh, 2)) / 6;
 
+  // console.log(sectionModulusY)
+  // console.log(sectionModulusZ)
+
+
   // Effective length coefficient based on support type
   const betaValues: { [key in SupportType]: number } = {
     'pinned': 1,
@@ -52,11 +56,13 @@ export function timberColumnDesign(
 
   // Compressive stress
   const sigma_cd = 1000 * N_ed / area;
-  console.log(sigma_cd)
 
   // Bending stresses
-  const sigma_mdY = M_yd / sectionModulusY;
-  const sigma_mdZ = M_zd / sectionModulusZ;
+  const sigma_mdY = 1000**2 * M_yd / sectionModulusY;
+  const sigma_mdZ = 1000**2 * M_zd / sectionModulusZ;
+  
+  // console.log(`M_yd = ${M_yd}`,)
+  // console.log(`sigma_mdZ = ${sigma_mdZ}`,)
 
   // Utilization ratios
   const utilizationY = sigma_cd / f_c0d + sigma_mdY / f_myd;
@@ -66,10 +72,10 @@ export function timberColumnDesign(
 
   const results = [
     column,
-    slendernessY.toFixed(1),
-    slendernessZ.toFixed(1),
     utilizationY.toFixed(2),
     utilizationZ.toFixed(2),
+    slendernessY.toFixed(1),
+    slendernessZ.toFixed(1),
   ];
 
   return results;

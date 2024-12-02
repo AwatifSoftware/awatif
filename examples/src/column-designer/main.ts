@@ -1,10 +1,4 @@
 import van, { State } from "vanjs-core";
-import {
-  AnalysisInputs,
-  Node,
-  Element,
-  AnalysisOutputs,
-} from "awatif-data-structure";
 import { Text } from "awatif-ui/src/viewer/objects/Text";
 import * as THREE from "three";
 import { sheets, viewer, layout, title, grid, marketing } from "awatif-ui";
@@ -33,6 +27,14 @@ const slabInputs = van.state([
   [0.5, 0.5, 0],
 ]);
 
+const slabInputs2 = van.state([
+  [0.5, 0.5, 1],
+  [16.5, 0.5, 1],
+  [16.5, 16.5, 1],
+  [0.5, 16.5, 1],
+  [0.5, 0.5, 1],
+]);
+
 
 const globalInputs = van.state([
   ["pinned", 0.8, 1.3, "GL28h"]]);
@@ -45,9 +47,9 @@ const lines = new THREE.Line(
 
 const points = new THREE.Points(
   new THREE.BufferGeometry(),
-  new THREE.PointsMaterial({
-  })
+  new THREE.PointsMaterial({})
 );
+
 
 var text = new Text("Hello World")
 text.position.set(5,5,0)
@@ -130,9 +132,10 @@ van.derive(() => {
   designResults.val = results;
 });
 
+console.log(designResults.val)
+
 // on inputPolyline change: render lines
 var xyCoords = [];
-var colText = [];
 for (let i = 0; i < noCols; i++) {
   const xCord = designInputs.val[i][7] as number; // x-coordinate
   const yCord = designInputs.val[i][8] as number; // y-coordinate
@@ -141,7 +144,6 @@ for (let i = 0; i < noCols; i++) {
   xyCoords.push([xCord, yCord, zCord]); // Push coordinates as an array
 }
 
-
 van.derive(() => {
 
   //lines
@@ -149,7 +151,7 @@ van.derive(() => {
     "position",
     new THREE.Float32BufferAttribute(slabInputs.val.flat(), 3)
   );
-  // lines.material.color.set(0x00ff00); // Green lines
+  lines.material.color.set(0x132e39); // Green lines
 
   //points
   const positions = xyCoords.flat();
@@ -174,7 +176,7 @@ van.derive(() => {
     // Multi-line text content
     const lines = [
       `Col${i + 1}`,
-      `η: ${designResults.val[i][3]*100}%`,
+      `η: ${designResults.val[i][1]*100}%`,
     ];
 
     lines.forEach((line, index) => {
@@ -185,6 +187,31 @@ van.derive(() => {
     });
   }
 
+  // surface
+  // Clear previous surfaces
+  const currentSurfaces = objects3D.rawVal.filter(obj => obj instanceof THREE.Mesh);
+  currentSurfaces.forEach(surface => {
+    surface.geometry.dispose(); // Dispose of geometry
+    surface.material.dispose(); // Dispose of material
+    objects3D.rawVal.splice(objects3D.rawVal.indexOf(surface), 1);
+  });
+
+  // Create and add the new surface
+  const vertices = slabInputs.val.flat();
+  const indices = [0, 1, 2, 0, 2, 3]; // Indices defining triangles
+  const geometry = new THREE.BufferGeometry();
+  geometry.setAttribute("position", new THREE.Float32BufferAttribute(vertices, 3));
+  geometry.setIndex(indices);
+
+  geometry.computeVertexNormals();
+
+  const material = new THREE.MeshBasicMaterial({
+    color: 0x132e39, // The color you want to use
+    side: THREE.DoubleSide, // Make both sides of the object visible
+  });
+
+  const surface = new THREE.Mesh(geometry, material);
+  objects3D.rawVal.push(surface);
 
   objects3D.val = [...objects3D.rawVal]; // trigger rendering
 });
@@ -207,10 +234,10 @@ document.body.append(
       element: grid({
         fields: [
           { field: "A", text: "Column"},
-          { field: "B", text: "λy"},
-          { field: "C", text: "λz"},
-          { field: "D", text: "ηy"},
-          { field: "E", text: "ηz"},
+          { field: "B", text: "ηy"},
+          { field: "C", text: "ηz"},
+          { field: "D", text: "λy"},
+          { field: "E", text: "λz"},
         ],
         data: designResults
       }),
