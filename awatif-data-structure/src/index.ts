@@ -52,14 +52,14 @@ type ElementAnalysisOutputs = {
 
 // High-order Model
 type ColumnAnalysisInput = {
-  load: unknown;
-  support: unknown;
+  load: [number, number, number];  // Ned, Myd, Mzd
+  support: string;
   section: unknown;
-  material: unknown;
+  material: string;
 };
 type ColumnAnalysisOutput = {
-  bending: unknown;
   axial: unknown;
+  bending: unknown;
 };
 
 type EcTimberColumnDesignInput = {
@@ -68,8 +68,8 @@ type EcTimberColumnDesignInput = {
 };
 
 type EcTimberColumnDesignOutput = {
-  slendernessRatio: number;
-  utilizationFactor: number;
+  slendernessRatio: [number, number]; //y and z direction
+  utilizationFactor: [number, number]; //y and z direction
 };
 
 type ColumnDesignInput = EcTimberColumnDesignInput;

@@ -5,6 +5,7 @@ export type SupportType = 'pinned' | 'cantilever' | 'fixed (top)' | 'fixed (bott
 
 // Define a function for timber column design
 export function timberColumnDesign(
+  column: string,  
   support: SupportType,
   length: number,         // length of the column
   width: number,          // width of the column cross-section
@@ -64,6 +65,7 @@ export function timberColumnDesign(
   // Check results
 
   const results = [
+    column,
     slendernessY.toFixed(1),
     slendernessZ.toFixed(1),
     utilizationY.toFixed(2),
@@ -75,6 +77,7 @@ export function timberColumnDesign(
 
 // Example usage:
 const result = timberColumnDesign(
+  "Col1",  
   'pinned',
   5000,       // Length in mm
   200,        // Width in mm

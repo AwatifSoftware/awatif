@@ -1,4 +1,11 @@
-import van from "vanjs-core";
+import van, { State } from "vanjs-core";
+import {
+  AnalysisInputs,
+  Node,
+  Element,
+  AnalysisOutputs,
+} from "awatif-data-structure";
+import { Text } from "awatif-ui/src/viewer/objects/Text";
 import * as THREE from "three";
 import { sheets, viewer, layout, title, grid, marketing } from "awatif-ui";
 import { html, TemplateResult } from "lit-html";
@@ -8,13 +15,13 @@ import { timberColumnDesign, SupportType } from "./timber-column-designer";
 const designInputs = van.state([
   ["Col1", 4.2, 0.4, 0.4, 2000, 10, 15, 1.0, 1.0],
   ["Col2", 4.2, 0.5, 0.5, 3000, 20, 25, 1.0, 8.25],
-  ["Col3", 4.2, 0.6, 0.6, 4000, 30, 35, 1.0, 16],
-  ["Col4", 4.2, 0.6, 0.6, 4000, 30, 35, 8.25, 1.0],
-  ["Col5", 4.2, 0.6, 0.6, 4000, 30, 35, 16, 1.0],
-  ["Col6", 4.2, 0.6, 0.6, 4000, 30, 35, 16, 16],
-  ["Col7", 4.2, 0.6, 0.6, 4000, 30, 35, 16, 8.25],
-  ["Col8", 4.2, 0.6, 0.6, 4000, 30, 35, 8.25, 16],
-  ["Col9", 4.2, 0.6, 0.6, 4000, 30, 35, 8.25, 8.25],
+  ["Col3", 4.2, 0.5, 0.5, 3000, 30, 35, 1.0, 16],
+  ["Col4", 4.2, 0.5, 0.5, 3000, 30, 35, 8.25, 1.0],
+  ["Col5", 4.2, 0.4, 0.4, 2000, 30, 35, 16, 1.0],
+  ["Col6", 4.2, 0.4, 0.4, 2000, 30, 35, 16, 16],
+  ["Col7", 4.2, 0.5, 0.5, 3000, 30, 35, 16, 8.25],
+  ["Col8", 4.2, 0.5, 0.5, 3000, 30, 35, 8.25, 16],
+  ["Col9", 4.2, 0.6, 0.6, 4000, 0, 0, 8.25, 8.25],
 
 ]);
 
@@ -25,6 +32,7 @@ const slabInputs = van.state([
   [0.5, 16.5, 0],
   [0.5, 0.5, 0],
 ]);
+
 
 const globalInputs = van.state([
   ["pinned", 0.8, 1.3, "GL28h"]]);
@@ -41,7 +49,10 @@ const points = new THREE.Points(
   })
 );
 
-const objects3D = van.state([lines, points]);
+var text = new Text("Hello World")
+text.position.set(5,5,0)
+
+const objects3D = van.state([lines, points, text]);
 const sheetsObj = new Map();
 
 // global inputs
@@ -87,12 +98,17 @@ sheetsObj.set("design-Inputs", {
 // events
 const onSheetChange = ({ data }) => (designInputs.val = data);
 const noCols = designInputs.val.length
+const colNames = [];
+for (let i = 0; i < noCols; i++) {
+  colNames.push(designInputs.val[i][0])
+}
 
 van.derive(() => {
 
   const results = [];
   for (let i = 0; i < noCols; i++) {
 
+    var column = designInputs.val[i][0] as string
     var support = globalInputs.val[0][0] as SupportType
     var length = designInputs.val[i][1] as number
     var width = designInputs.val[i][2] as number
@@ -108,19 +124,23 @@ van.derive(() => {
     var k_mod = globalInputs.val[0][1] as number
     var gamma = globalInputs.val[0][2] as number
 
-    const outputResults = timberColumnDesign(support, length, width, height, N_ed, M_yd, M_zd, f_c0k, f_myk, f_mzk, E_modulus, G_05, k_mod, gamma)
+    const outputResults = timberColumnDesign(column, support, length, width, height, N_ed, M_yd, M_zd, f_c0k, f_myk, f_mzk, E_modulus, G_05, k_mod, gamma)
     results.push(outputResults);
   }
   designResults.val = results;
 });
 
-console.log(designInputs[0])
-
 // on inputPolyline change: render lines
-const xyCoords = [];
+var xyCoords = [];
+var colText = [];
 for (let i = 0; i < noCols; i++) {
-  xyCoords.push(designInputs.val[i][7], designInputs.val[i][8], 0)
+  const xCord = designInputs.val[i][7] as number; // x-coordinate
+  const yCord = designInputs.val[i][8] as number; // y-coordinate
+  const zCord = 0; // z-coordinate
+
+  xyCoords.push([xCord, yCord, zCord]); // Push coordinates as an array
 }
+
 
 van.derive(() => {
 
@@ -133,13 +153,38 @@ van.derive(() => {
 
   //points
   const positions = xyCoords.flat();
-  console.log(positions)
   points.geometry.setAttribute(
     "position",
     new THREE.Float32BufferAttribute(positions, 3)
   );
   points.material.size = 1; // Larger points
   points.material.color.set(0xff0000); // Red points
+
+  //text
+  // Clear existing text objects
+  const currentTexts = objects3D.rawVal.filter(obj => obj instanceof Text);
+  currentTexts.forEach(textObj => objects3D.rawVal.splice(objects3D.rawVal.indexOf(textObj), 1));
+
+  // Add new text objects dynamically
+  for (let i = 0; i < noCols; i++) {
+    const xCord = designInputs.val[i][7] as number;
+    const yCord = designInputs.val[i][8] as number;
+    const zCord = 2;
+
+    // Multi-line text content
+    const lines = [
+      `Col${i + 1}`,
+      `η: ${designResults.val[i][3]*100}%`,
+    ];
+
+    lines.forEach((line, index) => {
+      const lineText = new Text(line);
+      lineText.updateScale(0.7)
+      lineText.position.set(xCord, yCord, zCord- index * 0.7); // Adjust yCord for each line
+      objects3D.rawVal.push(lineText); // Add to objects
+    });
+  }
+
 
   objects3D.val = [...objects3D.rawVal]; // trigger rendering
 });
@@ -167,12 +212,12 @@ document.body.append(
           { field: "D", text: "ηy"},
           { field: "E", text: "ηz"},
         ],
-        data: designResults,
+        data: designResults
       }),
       title: "Outputs",
     },
     right: { element: viewer({ objects3D }) },
-  })
+  }),
 );
 
 // Utils
@@ -200,7 +245,7 @@ function getGetStartedHtml(): TemplateResult {
 
 function getAuthorHtml(): TemplateResult {
   return html`<p style="line-height: 1.6">
-      Hi, I'm Mohamed Adil, a passionate structural engineer and software
+      Hi, I'm Cal Mense, a passionate structural engineer and software
       developer based in Amsterdam, with extensive experience in both fields.
       While working on the design of high-rise buildings, I realized that the
       structural design process was inefficient, leading to wasted time and
