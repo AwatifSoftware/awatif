@@ -17,7 +17,7 @@ const analysisOutputs: State<AnalysisOutputs> = van.state({});
 const params: Parameters = {
   width: { value: van.state(10), min: 0, max: 25 },
   breath: { value: van.state(5), min: 0, max: 25 },
-  load: { value: van.state(0), min: -5, max: 5 },
+  load: { value: van.state(-2), min: -5, max: 5 },
 };
 
 // visualize the rectangular mesh
@@ -30,12 +30,8 @@ van.derive(() => {
   const Nx = 8;
   const Ny = 8;
   const load = params.load.value.val;
-  const {
-    coordinates: quadNodes,
-    elements: quadElements,
-    nel,
-    nnode,
-  } = meshRectangularPlate(a, b, Nx, Ny);
+  const { coordinates: quadNodes, elements: quadElements } =
+    meshRectangularPlate(a, b, Nx, Ny);
 
   nodes.val = quadNodes;
   elements.val = quadElements;
@@ -45,8 +41,8 @@ van.derive(() => {
   const { stiffness, force } = calculateGlobalStiffnessMatrix(
     quadNodes,
     quadElements,
-    nel,
-    nnode,
+    quadElements.length,
+    quadNodes.length,
     E,
     nu,
     t,
@@ -55,14 +51,14 @@ van.derive(() => {
 
   // supports
   const typeBC = "c-c-c-c";
- 
+
   const constrainedDOFs = boundaryCondition(typeBC, quadNodes);
 
   // Apply constraints
   applyConstraints(stiffness, force, constrainedDOFs);
 
   // Solve for displacement
-  analysisOutputs.val = solveDisplacement(stiffness, force, nnode);
+  analysisOutputs.val = solveDisplacement(stiffness, force, quadNodes.length);
 });
 
 document.body.append(
@@ -72,6 +68,9 @@ document.body.append(
       nodes,
       elements,
       analysisOutputs,
+    },
+    settingsObj: {
+      deformedShape: true,
     },
   })
 );

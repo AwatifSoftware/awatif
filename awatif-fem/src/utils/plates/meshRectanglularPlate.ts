@@ -8,8 +8,6 @@ export function meshRectangularPlate(
 ): {
   coordinates: Node[];
   elements: Element[];
-  nel: number;
-  nnode: number;
 } {
   // Total number of elements and nodes
   const nel = Nx * Ny;
@@ -65,5 +63,5 @@ export function meshRectangularPlate(
     }
   }
 
-  return { coordinates, elements, nel, nnode };
+  return { coordinates, elements };
 }
