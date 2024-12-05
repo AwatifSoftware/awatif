@@ -45,7 +45,19 @@ sheetsObj.set("globalParam", {
   text: ["Global Parameter"],
   data: globalInputs,
   columns: [
-    { field: "0", text: "Support Type", editable: { type: "string" } },
+    { field: "0", text: "Support Type", 
+      editable: {
+        type: "list",
+        items: [
+          { id: 1, text: "Pinned" },
+          { id: 2, text: "Fixed" },
+        ],
+        openOnFocus: true,
+      },
+      render(record, extra) {
+        return extra.value?.text || "Pinned"; // default value
+      }, 
+    },
     { field: "1", text: "kmod", editable: { type: "float" } },
     { field: "2", text: "gamma", editable: { type: "float" } },
   ],
