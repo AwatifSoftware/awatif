@@ -27,15 +27,6 @@ const slabInputs = van.state([
   [0.5, 0.5, 0],
 ]);
 
-const slabInputs2 = van.state([
-  [0.5, 0.5, 1],
-  [16.5, 0.5, 1],
-  [16.5, 16.5, 1],
-  [0.5, 16.5, 1],
-  [0.5, 0.5, 1],
-]);
-
-
 const globalInputs = van.state([
   ["pinned", 0.8, 1.3, "GL28h"]]);
 
@@ -60,6 +51,7 @@ const sheetsObj = new Map();
 // global inputs
 sheetsObj.set("global-Param", {
   text: "Global",
+  size: '8px',
   fields: [
     { field: "A", text: "Support", editable: { type: "string" } },
     { field: "B", text: "kmod", editable: { type: "float" } },

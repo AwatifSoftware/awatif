@@ -3,7 +3,7 @@ import { defineConfig } from "vite";
 export default defineConfig({
   server: {
     port: 4600,
-    open: "sheets/index.html",
+    open: "column-designer/index.html",
   },
   root: "./src",
 });

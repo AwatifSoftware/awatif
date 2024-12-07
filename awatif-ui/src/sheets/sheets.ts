@@ -14,7 +14,13 @@ export function sheets({
       text: string;
       fields: object[];
       data: State<Data>;
+      show: {
+        toolbar: true,
+        footer: true,
+        toolbarSave: true
+    },
     }
+    
   >;
   onChange?: ({ sheet, data }) => void;
 }): HTMLElement {
