@@ -18,16 +18,15 @@ export type Structure = {
 export type Structure = {
   nodes?: State<Node[]>;
   elements?: State<Element[]>;
-  analysisInputs?: State<AnalysisInputs>;
-  analysisOutputs?: State<AnalysisOutputs>;
+  nodeInputs?: State<NodeInputs>;
+  elementInputs?: State<ElementInputs>;
+  nodeOutputs?: State<NodeOutputs>;
+  elementOutputs?: State<ElementOutputs>;
 };
 
 // The geometry of any structure can be represented by these two entities:
 export type Node = [number, number, number]; // position coordinates [x,y,z]
-export type Element = number[]; // indices of the first and second node in the list of nodes
-
-
-
+export type Element = number[]; // indices of the nodes list
 
 export type NodeInputs = {
   supports?: Map<
@@ -40,24 +39,26 @@ export type NodeInputs = {
 
 
 export type ElementInputs = {
-  elasticities?: Map<number, number>;
-  shearModuli?: Map<number, number>;
-  areas?: Map<number, number>;
-  momentsOfInertiaZ?: Map<number, number>;
-  momentsOfInertiaY?: Map<number, number>;
-  torsionalConstants?: Map<number, number>;
-  poissonRatios?: Map<number, number>;
-  thicknesses?: Map<number, number>;
-
+  elasticity?: Map<number, number>;
+  shearModulus?: Map<number, number>;
+  area?: Map<number, number>;
+  momentOfInertiaZ?: Map<number, number>;
+  momentOfInertiaY?: Map<number, number>;
+  torsionalConstant?: Map<number, number>;
 };
 
+export type NodeOutputs = {
+  deformation?: Map<number, [number, number, number, number, number, number]>;
+  reaction?: Map<number, [number, number, number, number, number, number]>;
+};
 
-
-
-
-export type DeformOutputs = {
-  deformations?: Map<number, [number, number, number, number, number, number]>;
-  reactions?: Map<number, [number, number, number, number, number, number]>;
+export type ElementOutputs = {
+  normal?: Map<number, [number, number]>;
+  shearY?: Map<number, [number, number]>;
+  shearZ?: Map<number, [number, number]>;
+  torsion?: Map<number, [number, number]>;
+  bendingY?: Map<number, [number, number]>;
+  bendingZ?: Map<number, [number, number]>;
 };
 
 // High-order Model
@@ -75,6 +76,29 @@ export type Building = {
   slabData: State<Map<number, unknown>>; // any additional data attached to slabs,
   // example (1) -> {analysisInput,designOutput,..}, 1 is slab index from slabs list
 };
+
+// Todo: think of way to separate the generic type ColumnAnalysisInput from the remaining specific onces
+// Todo: maybe better to separate functions from data
+type ColumnData = {
+  analysisInput?: ColumnAnalysisInput;
+  analysisOutput?: ColumnAnalysisOutput;
+  designInput?: ColumnDesignInput;
+  designOutput?: ColumnDesignOutput;
+  script?: (
+    analysisInput: ColumnAnalysisInput,
+    designInput: ColumnDesignInput
+  ) => ColumnDesignOutput;
+  report?: (
+    analysisInput: ColumnAnalysisInput,
+    designInput: ColumnDesignInput,
+    analysisOutput: ColumnAnalysisOutput,
+    designOutput: ColumnDesignOutput
+  ) => TemplateResult;
+  visualObject?: (inputs: unknown) => unknown;
+};
+
+type ColumnDesignInput = EcTimberColumnDesignInput;
+type ColumnDesignOutput = EcTimberColumnDesignOutput;
 
 type ColumnAnalysisInput = {
   load: unknown;
@@ -95,27 +119,4 @@ type EcTimberColumnDesignInput = {
 type EcTimberColumnDesignOutput = {
   slendernessRatio: number;
   utilizationFactor: number;
-};
-
-type ColumnDesignInput = EcTimberColumnDesignInput;
-type ColumnDesignOutput = EcTimberColumnDesignOutput;
-
-// Todo: think of way to separate the generic type ColumnAnalysisInput from the remaining specific onces
-// Todo: maybe better to separate functions from data
-type ColumnData = {
-  analysisInput?: ColumnAnalysisInput;
-  analysisOutput?: ColumnAnalysisOutput;
-  designInput?: ColumnDesignInput;
-  designOutput?: ColumnDesignOutput;
-  script?: (
-    analysisInput: ColumnAnalysisInput,
-    designInput: ColumnDesignInput
-  ) => ColumnDesignOutput;
-  report?: (
-    analysisInput: ColumnAnalysisInput,
-    designInput: ColumnDesignInput,
-    analysisOutput: ColumnAnalysisOutput,
-    designOutput: ColumnDesignOutput
-  ) => TemplateResult;
-  visualObject?: (inputs: unknown) => unknown;
 };
