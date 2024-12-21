@@ -220,6 +220,8 @@ van.derive(() => {
   objects3D.val = [...objects3D.rawVal]; // trigger rendering
 });
 
+let selectedOption = null;
+
 
 document.body.append(
   layout({
@@ -296,30 +298,37 @@ function getAuthorHtml(): TemplateResult {
 
 
 function getReport(designInputs, designResults): TemplateResult {
+  let selectedOption = 'None'; // Variable to store dropdown choice
 
-  var i = 0
-  console.log(designInputs)
+  var i = 0;
 
-  var column = designInputs.val[i][0] as string
-  var support = globalInputs.val[0][0] as SupportType
-  var length = designInputs.val[i][1] as number
-  var width = designInputs.val[i][2] as number
-  var height = designInputs.val[i][3] as number
-  var N_ed = designInputs.val[i][4] as number
-  var M_yd = designInputs.val[i][5] as number
-  var M_zd = designInputs.val[i][6] as number
-  var grade = globalInputs.val[0][3] as string
-  var E_modulus = 9500
-  var G_05 = 720
+  var column = designInputs.val[i][0] as string;
+  var support = globalInputs.val[0][0] as SupportType;
+  var length = designInputs.val[i][1] as number;
+  var width = designInputs.val[i][2] as number;
+  var height = designInputs.val[i][3] as number;
+  var N_ed = designInputs.val[i][4] as number;
+  var M_yd = designInputs.val[i][5] as number;
+  var M_zd = designInputs.val[i][6] as number;
+  var grade = globalInputs.val[0][3] as string;
+
   const { kMod, gamma, chi } = getKmod(2, "short-term");
   const glulam = getGlulamProperties(grade);
 
   const index = Array.from({ length: noCols }, (_, i) => i);
 
+  // Dropdown Choice Handler
+  function setChoice(option: string) {
+    selectedOption = option;
+    const selectedValueElement = document.getElementById('selected-value');
+    if (selectedValueElement) {
+      selectedValueElement.innerText = `Selected: ${selectedOption}`;
+    }
+    console.log('Selected Option:', selectedOption); // Debug in console
+  }
 
   return html`
-
-  <header class="header">
+    <header class="header">
       <div class="header-left">
         <h6>Timber Column Designer</h6>
         <p class="bolt">Awatif.co</p>
@@ -334,9 +343,9 @@ function getReport(designInputs, designResults): TemplateResult {
     <h2>Summary</h2>
     <br>
 
+    <!-- Table Section -->
     <table id="data-table">
       <tr>
-
         <th>Column</th>
         <th>Length</th>
         <th>Width</th>
@@ -347,62 +356,53 @@ function getReport(designInputs, designResults): TemplateResult {
         <th>Mzd</th>
         <th>Util Y</th>
         <th>Util Z</th>
-
       </tr>
       ${index.map(
         (i) => html`
           <tr>
-
-          <td><div class="custom-cell-content">${designInputs.val[i][0]}</div></td>
-          <td><div class="custom-cell-content">${designInputs.val[i][1]}</div></td>
-          <td><div class="custom-cell-content">${designInputs.val[i][2]}</div></td>
-          <td><div class="custom-cell-content">${designInputs.val[i][3]}</div></td>
-          <td><div class="custom-cell-content">${globalInputs.val[0][3]}</div></td>
-          <td><div class="custom-cell-content">${designInputs.val[i][4]}</div></td>
-          <td><div class="custom-cell-content">${designInputs.val[i][5]}</div></td>
-          <td><div class="custom-cell-content">${designInputs.val[i][6]}</div></td>
-          <td><div class="custom-cell-content">${designResults.val[i][1]}</div></td>
-          <td><div class="custom-cell-content">${designResults.val[i][2]}</div></td>
-
+            <td><div class="custom-cell-content">${designInputs.val[i][0]}</div></td>
+            <td><div class="custom-cell-content">${designInputs.val[i][1]}</div></td>
+            <td><div class="custom-cell-content">${designInputs.val[i][2]}</div></td>
+            <td><div class="custom-cell-content">${designInputs.val[i][3]}</div></td>
+            <td><div class="custom-cell-content">${globalInputs.val[0][3]}</div></td>
+            <td><div class="custom-cell-content">${designInputs.val[i][4]}</div></td>
+            <td><div class="custom-cell-content">${designInputs.val[i][5]}</div></td>
+            <td><div class="custom-cell-content">${designInputs.val[i][6]}</div></td>
+            <td><div class="custom-cell-content">${designResults.val[i][1]}</div></td>
+            <td><div class="custom-cell-content">${designResults.val[i][2]}</div></td>
           </tr>
         `
       )}
     </table>
 
-  <br>
-  <br>
-  <h2>Input Values</h2>
+    <br><br>
+    <h2>Input Values</h2>
+    <h3>System</h3>
+    <p class="p1">Column: ${column}</p>
+    <p class="p1">Grade: ${grade}</p>
+    <p class="p1">Support: ${support}</p>
 
-  <h3>System</h3>
-  <p class="p1">Column: ${column}</p>
-  <p class="p1">Grade: ${grade}</p>
-  <p class="p1">Support: ${support}</p>
+    <h3>Geometry</h3>
+    <p class="p1">Length: ${length} m</p>
+    <p class="p1">Width: ${width} m</p>
+    <p class="p1">Height: ${height} m</p>
 
-  <h3>Geometry</h3>
-  <p class="p1">Length: ${length} m</p>
-  <p class="p1">Width: ${width} m</p>
-  <p class="p1">Height: ${height} m</p>
+    <br>
+    <h2>Design Loading</h2>
+    <p class="math">${renderMath(`N_{ed} = ${N_ed} kN`)}</p>
 
-  <br>
-  <h2>Design Loading</h2>
-  <p class="math">${renderMath(`N_{ed} = ${N_ed} kN`)}</p>
+    <br>
+    <h2>Material Resistance</h2>
 
-  <br>
-  <h2>Material Resistance</h2>
+    <br>
+    <h2>Bending</h2>
+    <p class="p1">EN 1995-1-1 Ch. 6.3.2</p>
+    <p class="p1">y-Axis</p>
+    <p class="p1">z-Axis</p>
 
-  <br>
-  <h2>Bending</h2>
-  <p class="p1">EN 1995-1-1 Ch. 6.3.2</p>
-  <p class="p1">y-Axis</p>
-  <p class="p1">z-Axis</p>
-
-
-  <h2>Checks</h2>
-  <p class="p1">EN 1995-1-1 Ch. 6.3.2</p>
-  <p class="p1">y-Axis</p>
-  <p class="p1">z-Axis</p>
-
-
-
-  `
+    <h2>Checks</h2>
+    <p class="p1">EN 1995-1-1 Ch. 6.3.2</p>
+    <p class="p1">y-Axis</p>
+    <p class="p1">z-Axis</p>
+  `;
 }
