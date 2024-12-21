@@ -4,6 +4,10 @@ import * as THREE from "three";
 import { sheets, viewer, layout, title, grid, marketing } from "awatif-ui";
 import { html, TemplateResult } from "lit-html";
 import { timberColumnDesign, SupportType } from "./timber-column-designer";
+import { getKmod, getGlulamProperties } from "./utils";
+import { renderMath, toggleView } from "./reportUtils";
+
+import logo from "./awatif-logo.jpg";
 
 // init
 const designInputs = van.state([
@@ -15,8 +19,7 @@ const designInputs = van.state([
   ["Col6", 4.2, 0.4, 0.4, 2000, 30, 35, 16, 16],
   ["Col7", 4.2, 0.5, 0.5, 3000, 30, 35, 16, 8.25],
   ["Col8", 4.2, 0.5, 0.5, 3000, 30, 35, 8.25, 16],
-  ["Col9", 4.2, 0.6, 0.6, 4000, 0, 0, 8.25, 8.25],
-
+  ["Col9", 4.2, 0.6, 0.6, 5000, 0, 0, 8.25, 8.25],
 ]);
 
 const slabInputs = van.state([
@@ -28,7 +31,7 @@ const slabInputs = van.state([
 ]);
 
 const globalInputs = van.state([
-  ["pinned", 0.8, 1.3, "GL28h"]]);
+  ["pinned", 2, "long-term", "GL28h"]]);
 
 const designResults = van.state([]);
 const lines = new THREE.Line(
@@ -40,7 +43,6 @@ const points = new THREE.Points(
   new THREE.BufferGeometry(),
   new THREE.PointsMaterial({})
 );
-
 
 var text = new Text("Hello World")
 text.position.set(5,5,0)
@@ -54,13 +56,13 @@ sheetsObj.set("global-Param", {
   size: '8px',
   fields: [
     { field: "A", text: "Support", editable: { type: "string" } },
-    { field: "B", text: "kmod", editable: { type: "float" } },
-    { field: "C", text: "gamma", editable: { type: "float" } },
-    { field: "D", text: "Grade", editable: { type: "float" } },
-
+    { field: "B", text: "serviceClass", editable: { type: "number" } },
+    { field: "C", text: "loadDurationClass", editable: { type: "string" } },
+    { field: "D", text: "Grade", editable: { type: "string" } },
   ],
   data: globalInputs,
 });
+console.log(globalInputs)
 
 // global inputs
 sheetsObj.set("slab-Inputs", {
@@ -89,13 +91,26 @@ sheetsObj.set("design-Inputs", {
   data: designInputs,
 });
 
+
 // events
-const onSheetChange = ({ data }) => (designInputs.val = data);
+const onSheetChange = ({ data, sheet }) => {
+  console.log(`Data updated on sheet: ${sheet}`);
+  if (sheet == "design-Inputs") {
+      var changedData = designInputs
+  } else if (sheet == "slab-Inputs") {
+      changedData = slabInputs
+  } else {
+      changedData = globalInputs
+  }
+  changedData.val = data; // Update the reactive state with new sheet data
+};
+
 const noCols = designInputs.val.length
 const colNames = [];
 for (let i = 0; i < noCols; i++) {
   colNames.push(designInputs.val[i][0])
 }
+
 
 van.derive(() => {
 
@@ -110,21 +125,18 @@ van.derive(() => {
     var N_ed = designInputs.val[i][4] as number
     var M_yd = designInputs.val[i][5] as number
     var M_zd = designInputs.val[i][6] as number
-    var f_c0k = 28
-    var f_myk = 28
-    var f_mzk = 28
+    var grade = globalInputs.val[0][3] as string
     var E_modulus = 9500
     var G_05 = 720
-    var k_mod = globalInputs.val[0][1] as number
-    var gamma = globalInputs.val[0][2] as number
+    const { kMod, gamma, chi } = getKmod(2, "short-term");
+    const glulam = getGlulamProperties(grade);
 
-    const outputResults = timberColumnDesign(column, support, length, width, height, N_ed, M_yd, M_zd, f_c0k, f_myk, f_mzk, E_modulus, G_05, k_mod, gamma)
+    const outputResults = timberColumnDesign(column, support, length, width, height, N_ed, M_yd, M_zd, glulam, chi)
     results.push(outputResults);
   }
   designResults.val = results;
 });
 
-console.log(designResults.val)
 
 // on inputPolyline change: render lines
 var xyCoords = [];
@@ -216,6 +228,7 @@ document.body.append(
       element: marketing({
         getStarted: getGetStartedHtml(),
         author: getAuthorHtml(),
+        report: getReport(designInputs, designResults),
       }),
     },
     main: {
@@ -239,14 +252,6 @@ document.body.append(
   }),
 );
 
-// Utils
-function getLength(point1: number[], point2: number[]): number {
-  return Math.sqrt(
-    Math.pow(point2[0] - point1[0], 2) +
-      Math.pow(point2[1] - point1[1], 2) +
-      Math.pow(point2[2] - point1[2], 2)
-  );
-}
 
 function getGetStartedHtml(): TemplateResult {
   return html`<p>In this video you will learn why we build this platform:</p>
@@ -287,4 +292,117 @@ function getAuthorHtml(): TemplateResult {
       height="200"
       src="https://awatif.co/img/services/mohamed.jpg"
     /> `;
+}
+
+
+function getReport(designInputs, designResults): TemplateResult {
+
+  var i = 0
+  console.log(designInputs)
+
+  var column = designInputs.val[i][0] as string
+  var support = globalInputs.val[0][0] as SupportType
+  var length = designInputs.val[i][1] as number
+  var width = designInputs.val[i][2] as number
+  var height = designInputs.val[i][3] as number
+  var N_ed = designInputs.val[i][4] as number
+  var M_yd = designInputs.val[i][5] as number
+  var M_zd = designInputs.val[i][6] as number
+  var grade = globalInputs.val[0][3] as string
+  var E_modulus = 9500
+  var G_05 = 720
+  const { kMod, gamma, chi } = getKmod(2, "short-term");
+  const glulam = getGlulamProperties(grade);
+
+  const index = Array.from({ length: noCols }, (_, i) => i);
+
+
+  return html`
+
+  <header class="header">
+      <div class="header-left">
+        <h6>Timber Column Designer</h6>
+        <p class="bolt">Awatif.co</p>
+        <p class="normal">20.12.2024</p>
+      </div>
+      <div class="header-right">
+        <img src=${logo} id="headerLogo" height="60px" />
+      </div>
+    </header>
+
+    <br>
+    <h2>Summary</h2>
+    <br>
+
+    <table id="data-table">
+      <tr>
+
+        <th>Column</th>
+        <th>Length</th>
+        <th>Width</th>
+        <th>Height</th>
+        <th>Grade</th>
+        <th>Ned</th>
+        <th>Myd</th>
+        <th>Mzd</th>
+        <th>Util Y</th>
+        <th>Util Z</th>
+
+      </tr>
+      ${index.map(
+        (i) => html`
+          <tr>
+
+          <td><div class="custom-cell-content">${designInputs.val[i][0]}</div></td>
+          <td><div class="custom-cell-content">${designInputs.val[i][1]}</div></td>
+          <td><div class="custom-cell-content">${designInputs.val[i][2]}</div></td>
+          <td><div class="custom-cell-content">${designInputs.val[i][3]}</div></td>
+          <td><div class="custom-cell-content">${globalInputs.val[0][3]}</div></td>
+          <td><div class="custom-cell-content">${designInputs.val[i][4]}</div></td>
+          <td><div class="custom-cell-content">${designInputs.val[i][5]}</div></td>
+          <td><div class="custom-cell-content">${designInputs.val[i][6]}</div></td>
+          <td><div class="custom-cell-content">${designResults.val[i][1]}</div></td>
+          <td><div class="custom-cell-content">${designResults.val[i][2]}</div></td>
+
+          </tr>
+        `
+      )}
+    </table>
+
+  <br>
+  <br>
+  <h2>Input Values</h2>
+
+  <h3>System</h3>
+  <p class="p1">Column: ${column}</p>
+  <p class="p1">Grade: ${grade}</p>
+  <p class="p1">Support: ${support}</p>
+
+  <h3>Geometry</h3>
+  <p class="p1">Length: ${length} m</p>
+  <p class="p1">Width: ${width} m</p>
+  <p class="p1">Height: ${height} m</p>
+
+  <br>
+  <h2>Design Loading</h2>
+  <p class="math">${renderMath(`N_{ed} = ${N_ed} kN`)}</p>
+
+  <br>
+  <h2>Material Resistance</h2>
+
+  <br>
+  <h2>Bending</h2>
+  <p class="p1">EN 1995-1-1 Ch. 6.3.2</p>
+  <p class="p1">y-Axis</p>
+  <p class="p1">z-Axis</p>
+
+
+  <h2>Checks</h2>
+  <p class="p1">EN 1995-1-1 Ch. 6.3.2</p>
+  <p class="p1">y-Axis</p>
+  <p class="p1">z-Axis</p>
+
+
+
+  `
 }

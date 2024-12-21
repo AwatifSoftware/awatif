@@ -1,4 +1,5 @@
 import van from "vanjs-core";
+import { Glulam } from "./utils";
 
 // Define a type for support conditions
 export type SupportType = 'pinned' | 'cantilever' | 'fixed (top)' | 'fixed (bottom)';
@@ -13,13 +14,8 @@ export function timberColumnDesign(
   N_ed: number,           // axial load [N]
   M_yd: number,           // bending moment around y-axis [Nm]
   M_zd: number,           // bending moment around z-axis [Nm]
-  f_c0k: number,          // characteristic compressive strength parallel to grain [MPa]
-  f_myk: number,          // characteristic bending strength around y-axis [MPa]
-  f_mzk: number,          // characteristic bending strength around z-axis [MPa]
-  E_modulus: number,      // modulus of elasticity [MPa]
-  G_05: number,           // shear modulus [MPa]
-  k_mod: number,          // modification factor
-  gamma: number           // partial safety factor
+  grade: Glulam,
+  chi: number,          // modification factor
 ) {
   // Geometry
   const widthh = width * 1000
@@ -29,9 +25,9 @@ export function timberColumnDesign(
   const sectionModulusY = (widthh * Math.pow(heightt, 2)) / 6;
   const sectionModulusZ = (heightt * Math.pow(widthh, 2)) / 6;
 
-  // console.log(sectionModulusY)
-  // console.log(sectionModulusZ)
-
+  var f_c0k = grade.f_c0k
+  var f_myk = grade.f_mk
+  var f_mzk = grade.f_mk
 
   // Effective length coefficient based on support type
   const betaValues: { [key in SupportType]: number } = {
@@ -44,9 +40,9 @@ export function timberColumnDesign(
   const effectiveLength = length * beta;
 
   // Adjusted strengths
-  const f_c0d = f_c0k * (k_mod / gamma);
-  const f_myd = f_myk * (k_mod / gamma);
-  const f_mzd = f_mzk * (k_mod / gamma);
+  const f_c0d = f_c0k * chi;
+  const f_myd = f_myk * chi;
+  const f_mzd = f_mzk * chi;
 
   // Slenderness ratio
   const radiusOfGyrationY = height / Math.sqrt(12);
@@ -81,22 +77,5 @@ export function timberColumnDesign(
   return results;
 }
 
-// Example usage:
-const result = timberColumnDesign(
-  "Col1",  
-  'pinned',
-  5000,       // Length in mm
-  200,        // Width in mm
-  300,        // Height in mm
-  100000,     // Axial load in N
-  50000,      // Bending moment around y-axis in Nm
-  40000,      // Bending moment around z-axis in Nm
-  24,         // Characteristic compressive strength in MPa
-  30,         // Bending strength around y-axis in MPa
-  28,         // Bending strength around z-axis in MPa
-  12000,      // Modulus of elasticity in MPa
-  500,        // Shear modulus in MPa
-  0.9,        // Modification factor
-  1.3         // Partial safety factor
-);
+
 

@@ -57,6 +57,7 @@ type ColumnAnalysisInput = {
   section: unknown;
   material: string;
 };
+
 type ColumnAnalysisOutput = {
   axial: unknown;
   bending: unknown;

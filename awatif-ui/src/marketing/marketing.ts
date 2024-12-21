@@ -6,14 +6,22 @@ import "./styles.css";
 export function marketing({
   getStarted,
   author,
+  report,
 }: {
   getStarted?: TemplateResult;
   author?: TemplateResult;
+  report?: TemplateResult;
 }): HTMLElement {
   // init
   const marketingElm = document.createElement("div");
 
   const content = html` <ul>
+    <li>
+        <div class="popup">
+          <button>Report</button>
+          <div>${report}</div>
+        </div>
+    </li>
     <li>
       <div class="popup">
         <button>Get started</button>
@@ -67,6 +75,18 @@ export function marketing({
 
   // events: attach popup to elements
   marketingElm.querySelectorAll(".popup").forEach((el) => {
+    el.addEventListener("click", () => {
+      w2popup.open({
+        title: el.querySelector("button")?.textContent,
+        body: el.querySelector("div")?.outerHTML,
+        width: 600,
+        height: 450,
+      });
+    });
+  });
+
+  // events: attach popup to elements
+  marketingElm.querySelectorAll(".reportPopup").forEach((el) => {
     el.addEventListener("click", () => {
       w2popup.open({
         title: el.querySelector("button")?.textContent,
