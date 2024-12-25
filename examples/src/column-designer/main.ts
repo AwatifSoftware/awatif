@@ -5,8 +5,9 @@ import { sheets, viewer, layout, title, grid, marketing } from "awatif-ui";
 import { html, TemplateResult } from "lit-html";
 import { timberColumnDesign, SupportType } from "./timber-column-designer";
 import { getKmod, getGlulamProperties } from "./utils";
-import { renderMath, toggleView } from "./reportUtils";
+import { renderMath } from "./reportUtils";
 
+//@ts-ignorets-ignore
 import logo from "./awatif-logo.jpg";
 
 // init
@@ -62,7 +63,7 @@ sheetsObj.set("global-Param", {
   ],
   data: globalInputs,
 });
-console.log(globalInputs)
+// console.log(globalInputs)
 
 // global inputs
 sheetsObj.set("slab-Inputs", {
@@ -111,32 +112,38 @@ for (let i = 0; i < noCols; i++) {
   colNames.push(designInputs.val[i][0])
 }
 
-
 van.derive(() => {
 
   const results = [];
   for (let i = 0; i < noCols; i++) {
 
     var column = designInputs.val[i][0] as string
-    var support = globalInputs.val[0][0] as SupportType
     var length = designInputs.val[i][1] as number
     var width = designInputs.val[i][2] as number
     var height = designInputs.val[i][3] as number
     var N_ed = designInputs.val[i][4] as number
     var M_yd = designInputs.val[i][5] as number
     var M_zd = designInputs.val[i][6] as number
+
+    var support = globalInputs.val[0][0] as any
+    var serviceClass = globalInputs.val[0][1] as number
+    var loadDurationClass = globalInputs.val[0][2] as string
     var grade = globalInputs.val[0][3] as string
-    var E_modulus = 9500
-    var G_05 = 720
-    const { kMod, gamma, chi } = getKmod(2, "short-term");
+
+    const { kMod, gamma, chi } = getKmod(serviceClass, loadDurationClass);
     const glulam = getGlulamProperties(grade);
 
-    const outputResults = timberColumnDesign(column, support, length, width, height, N_ed, M_yd, M_zd, glulam, chi)
-    results.push(outputResults);
+    const columnDesignResults = timberColumnDesign(column, support, length, width, height, N_ed, M_yd, M_zd, glulam, chi)
+    results.push(columnDesignResults);
+    // designResults.val = [...designResults.val, columnDesignResults];
+
   }
   designResults.val = results;
+  // console.log("results", results)
+
 });
 
+// console.log("designResults", designResults)
 
 // on inputPolyline change: render lines
 var xyCoords = [];
@@ -180,7 +187,7 @@ van.derive(() => {
     // Multi-line text content
     const lines = [
       `Col${i + 1}`,
-      `η: ${designResults.val[i][1]*100}%`,
+      `η: ${(designResults.val[i].utilizationY*100).toFixed(0)}%`,
     ];
 
     lines.forEach((line, index) => {
@@ -215,13 +222,11 @@ van.derive(() => {
   });
 
   const surface = new THREE.Mesh(geometry, material);
+  //@ts-ignore
   objects3D.rawVal.push(surface);
 
   objects3D.val = [...objects3D.rawVal]; // trigger rendering
 });
-
-let selectedOption = null;
-
 
 document.body.append(
   layout({
@@ -296,36 +301,111 @@ function getAuthorHtml(): TemplateResult {
     /> `;
 }
 
+function getDropdown(): TemplateResult {
+  return html`
+  <div class="dropdown-container">
+    <label for="dropdown">Select an option:</label>
+    <select id="dropdown" name="dropdown">
+      <option>Choose an option</option>
+      <option value="html">HTML</option>
+      <option value="java">JAVA</option>
+      <option value="C++">C++</option>
+      <option value="php">PHP</option>
+      <option value="perl">PERL</option>
+    </select>
+    <p>Selected: <span id="selected-option">None</span></p>
+  </div>
+
+  <script> 
+    document.getElementById('dropdown').addEventListener('change', function (event) {
+      const selectedValue = event.target.value;
+      document.getElementById('selected-option').innerText = selectedValue || 'None';
+    });
+  </script>
+
+      
+ 
+  `;
+}
+
+function getDropdown2(): TemplateResult {
+  return html`
+        <body>
+
+        <div class="dropdown">
+            <button class="dropbtn">Select Items</button>
+            <div class="dropdown-content">
+                <input type="checkbox" id="column1"
+                    value="0"><label for="column1">HTML</label><br>
+                <input type="checkbox" id="column2"
+                    value="1"><label for="column2">CSS</label><br>
+                <input type="checkbox" id="column3"
+                    value="2"><label for="column3">
+                    JavaScript</label><br>
+            </div>
+        </div>
+
+        <button onclick="submitSelection()" class="submit-btn">Submit</button>
+
+        <script>
+            function submitSelection() {
+                let selectedItems = [];
+                let checkboxes = document.querySelectorAll(
+                    'input[type=checkbox]:checked');
+                checkboxes.forEach(function (checkbox) {
+                    selectedItems.push(checkbox.value);
+                });
+                alert("Selected items: " + selectedItems.join(', '));
+                i = selectedItems[0]
+            }
+        </script>
+
+      </body>
+  `;
+}
+
+
+// let selectedOption: string = '';
+
+// Event-Handler-Funktion
+function handleDropdownChange(event: Event) {
+  const selectElement = event.target as HTMLSelectElement;
+  const selectedOption = selectElement.value;
+
+  console.log('Selected Option:', selectedOption);
+
+  const displayElement = document.getElementById('selected-option');
+  if (displayElement) {
+      displayElement.innerText = selectedOption;
+  } else {
+      console.warn('Element mit ID "selected-option" wurde nicht gefunden.');
+  }
+}
 
 function getReport(designInputs, designResults): TemplateResult {
-  let selectedOption = 'None'; // Variable to store dropdown choice
 
   var i = 0;
 
-  var column = designInputs.val[i][0] as string;
-  var support = globalInputs.val[0][0] as SupportType;
-  var length = designInputs.val[i][1] as number;
-  var width = designInputs.val[i][2] as number;
-  var height = designInputs.val[i][3] as number;
-  var N_ed = designInputs.val[i][4] as number;
-  var M_yd = designInputs.val[i][5] as number;
-  var M_zd = designInputs.val[i][6] as number;
-  var grade = globalInputs.val[0][3] as string;
+  var column = designInputs.val[i][0] as string
+  var length = designInputs.val[i][1] as number
+  var width = designInputs.val[i][2] as number
+  var height = designInputs.val[i][3] as number
+  var N_ed = designInputs.val[i][4] as number
+  var M_yd = designInputs.val[i][5] as number
+  var M_zd = designInputs.val[i][6] as number
 
-  const { kMod, gamma, chi } = getKmod(2, "short-term");
+  var support = globalInputs.val[0][0] as any
+  var serviceClass = globalInputs.val[0][1] as number
+  var loadDurationClass = globalInputs.val[0][2] as string
+  var grade = globalInputs.val[0][3] as string
+
+  const { kMod, gamma, chi } = getKmod(serviceClass, loadDurationClass);
   const glulam = getGlulamProperties(grade);
 
   const index = Array.from({ length: noCols }, (_, i) => i);
 
-  // Dropdown Choice Handler
-  function setChoice(option: string) {
-    selectedOption = option;
-    const selectedValueElement = document.getElementById('selected-value');
-    if (selectedValueElement) {
-      selectedValueElement.innerText = `Selected: ${selectedOption}`;
-    }
-    console.log('Selected Option:', selectedOption); // Debug in console
-  }
+  
+
 
   return html`
     <header class="header">
@@ -338,6 +418,9 @@ function getReport(designInputs, designResults): TemplateResult {
         <img src=${logo} id="headerLogo" height="60px" />
       </div>
     </header>
+
+    ${getDropdown()}
+    
 
     <br>
     <h2>Summary</h2>
@@ -368,8 +451,8 @@ function getReport(designInputs, designResults): TemplateResult {
             <td><div class="custom-cell-content">${designInputs.val[i][4]}</div></td>
             <td><div class="custom-cell-content">${designInputs.val[i][5]}</div></td>
             <td><div class="custom-cell-content">${designInputs.val[i][6]}</div></td>
-            <td><div class="custom-cell-content">${designResults.val[i][1]}</div></td>
-            <td><div class="custom-cell-content">${designResults.val[i][2]}</div></td>
+            <td><div class="custom-cell-content">${designResults.val[i].utilizationY.toFixed(2)}</div></td>
+            <td><div class="custom-cell-content">${designResults.val[i].utilizationZ.toFixed(2)}</div></td>
           </tr>
         `
       )}
@@ -382,27 +465,61 @@ function getReport(designInputs, designResults): TemplateResult {
     <p class="p1">Grade: ${grade}</p>
     <p class="p1">Support: ${support}</p>
 
+    <p class="p1">The service class is ${serviceClass}.</p>
+    <p class="p1">The load duration class class is ${loadDurationClass}.</p>
+
+    <br>
     <h3>Geometry</h3>
     <p class="p1">Length: ${length} m</p>
     <p class="p1">Width: ${width} m</p>
     <p class="p1">Height: ${height} m</p>
 
     <br>
-    <h2>Design Loading</h2>
-    <p class="math">${renderMath(`N_{ed} = ${N_ed} kN`)}</p>
+    <h3>Material Properties</h3>
+    <p class="p1">f<sub>c,0,k</sub>= ${glulam.f_c0k} N/mm²</p>
+    <p class="p1">f<sub>m,y,k</sub>= ${glulam.f_mk} N/mm²</p>
+    <p class="p1">f<sub>m,z,k</sub>= ${glulam.f_mk} N/mm²</p>
+
+    <br>
+    <h2>Geometry Properties</h2>
+    <p class="p1">Area= ${designResults.val[i].area.toFixed(0)} m²</p>
+    <p class="p1">W<sub>ply</sub>= ${designResults.val[i].sectionModulusY.toFixed(0)} cm³</p>
+    <p class="p1">W<sub>plz</sub>= ${designResults.val[i].sectionModulusZ.toFixed(0)} cm³</p>
+  
 
     <br>
     <h2>Material Resistance</h2>
+    <p class="math">${renderMath(`k_{mod} = ${kMod}`)}</p>
+    <p class="math">${renderMath(`\\gamma = ${gamma}`)}</p>
+    <p class="math">${renderMath(`\\chi = ${chi.toFixed(2)}`)}</p>
+    <p class="p1">f<sub>c,0,d</sub>= ${designResults.val[i].f_c0d.toFixed(2)} N/mm²</p>
+    <p class="p1">f<sub>m,y,d</sub>= ${designResults.val[i].f_myd.toFixed(2)} N/mm²</p>
+    <p class="p1">f<sub>m,z,d</sub>= ${designResults.val[i].f_mzd.toFixed(2)} N/mm²</p>
 
+    <br>
+    <h2>Design Loading</h2>
+    <p class="math">${renderMath(`N_{ed} = ${N_ed} kN`)}</p>  
+    <p class="math">${renderMath(`M_{yd} = ${M_yd} kNm`)}</p>
+    <p class="math">${renderMath(`M_{zd} = ${M_zd} kNm`)}</p> 
+
+    <br>
     <br>
     <h2>Bending</h2>
     <p class="p1">EN 1995-1-1 Ch. 6.3.2</p>
     <p class="p1">y-Axis</p>
     <p class="p1">z-Axis</p>
 
+    <br>
     <h2>Checks</h2>
     <p class="p1">EN 1995-1-1 Ch. 6.3.2</p>
     <p class="p1">y-Axis</p>
     <p class="p1">z-Axis</p>
   `;
 }
+
+document.addEventListener('DOMContentLoaded', () => {
+  const dropdown = document.getElementById('menu') as HTMLSelectElement | null;
+  if (dropdown) {
+      dropdown.addEventListener('change', handleDropdownChange);
+  }
+});

@@ -4,6 +4,28 @@ import { Glulam } from "./utils";
 // Define a type for support conditions
 export type SupportType = 'pinned' | 'cantilever' | 'fixed (top)' | 'fixed (bottom)';
 
+export interface ColumnDesignResults {
+  column: string;
+  utilizationY: number;
+  utilizationZ: number;
+  slendernessY: number;
+  slendernessZ: number;
+  area: number;
+  sectionModulusY: number;
+  sectionModulusZ: number;
+  beta: number;
+  effectiveLength: number;
+  f_c0d: number;
+  f_myd: number;
+  f_mzd: number;
+  radiusOfGyrationY: number;
+  radiusOfGyrationZ: number;
+  sigma_cd: number;
+  sigma_mdY: number;
+  sigma_mdZ: number;
+}
+
+
 // Define a function for timber column design
 export function timberColumnDesign(
   column: string,  
@@ -64,17 +86,28 @@ export function timberColumnDesign(
   const utilizationY = sigma_cd / f_c0d + sigma_mdY / f_myd;
   const utilizationZ = sigma_cd / f_c0d + sigma_mdZ / f_mzd;
 
-  // Check results
-
-  const results = [
-    column,
-    utilizationY.toFixed(2),
-    utilizationZ.toFixed(2),
-    slendernessY.toFixed(1),
-    slendernessZ.toFixed(1),
-  ];
-
-  return results;
+  const columnDesignResults: ColumnDesignResults = {
+    column: column,
+    utilizationY: utilizationY,
+    utilizationZ: utilizationZ,
+    slendernessY: slendernessY,
+    slendernessZ: slendernessZ,
+    area: area,
+    sectionModulusY: sectionModulusY,
+    sectionModulusZ: sectionModulusZ,
+    beta: beta,
+    effectiveLength: effectiveLength,
+    f_c0d: f_c0d,
+    f_myd: f_myd,
+    f_mzd: f_mzd,
+    radiusOfGyrationY: radiusOfGyrationY,
+    radiusOfGyrationZ: radiusOfGyrationZ,
+    sigma_cd: sigma_cd,
+    sigma_mdY: sigma_mdY,
+    sigma_mdZ: sigma_mdZ,
+  };
+  
+  return columnDesignResults;
 }
 
 
