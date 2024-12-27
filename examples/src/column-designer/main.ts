@@ -35,6 +35,7 @@ const globalInputs = van.state([
   ["pinned", 2, "long-term", "GL28h"]]);
 
 const designResults = van.state([]);
+const designResultsInterface = van.state([]);
 const lines = new THREE.Line(
   new THREE.BufferGeometry(),
   new THREE.LineBasicMaterial()
@@ -92,12 +93,12 @@ sheetsObj.set("design-Inputs", {
   data: designInputs,
 });
 
-
 // events
 const onSheetChange = ({ data, sheet }) => {
   console.log(`Data updated on sheet: ${sheet}`);
   if (sheet == "design-Inputs") {
       var changedData = designInputs
+      
   } else if (sheet == "slab-Inputs") {
       changedData = slabInputs
   } else {
@@ -115,6 +116,7 @@ for (let i = 0; i < noCols; i++) {
 van.derive(() => {
 
   const results = [];
+  const resultsInterface = [];
   for (let i = 0; i < noCols; i++) {
 
     var column = designInputs.val[i][0] as string
@@ -134,16 +136,27 @@ van.derive(() => {
     const glulam = getGlulamProperties(grade);
 
     const columnDesignResults = timberColumnDesign(column, support, length, width, height, N_ed, M_yd, M_zd, glulam, chi)
-    results.push(columnDesignResults);
+    // const columnDesignResultsValues = Object.values(columnDesignResults).slice(0, 5);
+
+    resultsInterface.push(columnDesignResults)
+    const columnDesignResultsValues = Object.values(columnDesignResults)
+      .slice(0, 5)
+      .map(value => (typeof value === 'number' ? Number(value.toFixed(2)) : value));
+
+    results.push(columnDesignResultsValues);
     // designResults.val = [...designResults.val, columnDesignResults];
 
   }
   designResults.val = results;
+  designResultsInterface.val = resultsInterface
   // console.log("results", results)
 
 });
 
-// console.log("designResults", designResults)
+console.log("designResults", designResults.val)
+console.log("designResultsInterface", designResultsInterface.val[0].utilizationY)
+
+
 
 // on inputPolyline change: render lines
 var xyCoords = [];
@@ -183,11 +196,14 @@ van.derive(() => {
     const xCord = designInputs.val[i][7] as number;
     const yCord = designInputs.val[i][8] as number;
     const zCord = 2;
+    // const etaMax = Math.max(designResults.val[i][1], designResults.val[i][2]);
+    const etaMax = (Math.max(designResultsInterface.val[i].utilizationY, designResultsInterface.val[i].utilizationZ)*100).toFixed(0);
+    // console.log(etaMax)
 
     // Multi-line text content
     const lines = [
       `Col${i + 1}`,
-      `η: ${(designResults.val[i].utilizationY*100).toFixed(0)}%`,
+      `η: ${etaMax}%`,
     ];
 
     lines.forEach((line, index) => {
@@ -451,8 +467,8 @@ function getReport(designInputs, designResults): TemplateResult {
             <td><div class="custom-cell-content">${designInputs.val[i][4]}</div></td>
             <td><div class="custom-cell-content">${designInputs.val[i][5]}</div></td>
             <td><div class="custom-cell-content">${designInputs.val[i][6]}</div></td>
-            <td><div class="custom-cell-content">${designResults.val[i].utilizationY.toFixed(2)}</div></td>
-            <td><div class="custom-cell-content">${designResults.val[i].utilizationZ.toFixed(2)}</div></td>
+            <td><div class="custom-cell-content">${designResults.val[i].utilizationY}</div></td>
+            <td><div class="custom-cell-content">${designResults.val[i].utilizationZ}</div></td>
           </tr>
         `
       )}
@@ -482,9 +498,9 @@ function getReport(designInputs, designResults): TemplateResult {
 
     <br>
     <h2>Geometry Properties</h2>
-    <p class="p1">Area= ${designResults.val[i].area.toFixed(0)} m²</p>
-    <p class="p1">W<sub>ply</sub>= ${designResults.val[i].sectionModulusY.toFixed(0)} cm³</p>
-    <p class="p1">W<sub>plz</sub>= ${designResults.val[i].sectionModulusZ.toFixed(0)} cm³</p>
+    <p class="p1">Area= ${designResults.val[i].area} m²</p>
+    <p class="p1">W<sub>ply</sub>= ${designResults.val[i].sectionModulusY} cm³</p>
+    <p class="p1">W<sub>plz</sub>= ${designResults.val[i].sectionModulusZ} cm³</p>
   
 
     <br>
@@ -492,9 +508,9 @@ function getReport(designInputs, designResults): TemplateResult {
     <p class="math">${renderMath(`k_{mod} = ${kMod}`)}</p>
     <p class="math">${renderMath(`\\gamma = ${gamma}`)}</p>
     <p class="math">${renderMath(`\\chi = ${chi.toFixed(2)}`)}</p>
-    <p class="p1">f<sub>c,0,d</sub>= ${designResults.val[i].f_c0d.toFixed(2)} N/mm²</p>
-    <p class="p1">f<sub>m,y,d</sub>= ${designResults.val[i].f_myd.toFixed(2)} N/mm²</p>
-    <p class="p1">f<sub>m,z,d</sub>= ${designResults.val[i].f_mzd.toFixed(2)} N/mm²</p>
+    <p class="p1">f<sub>c,0,d</sub>= ${designResults.val[i].f_c0d} N/mm²</p>
+    <p class="p1">f<sub>m,y,d</sub>= ${designResults.val[i].f_myd} N/mm²</p>
+    <p class="p1">f<sub>m,z,d</sub>= ${designResults.val[i].f_mzd} N/mm²</p>
 
     <br>
     <h2>Design Loading</h2>
