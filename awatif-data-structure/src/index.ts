@@ -20,8 +20,8 @@ export type Structure = {
   elements?: State<Element[]>;
   nodeInputs?: State<NodeInputs>;
   elementInputs?: State<ElementInputs>;
-  nodeOutputs?: State<NodeOutputs>;
-  elementOutputs?: State<ElementOutputs>;
+  deformOutputs?: State<DeformOutputs>;
+  analyzeOutputs?: State<AnalyzeOutputs>;
 };
 
 // The geometry of any structure can be represented by these two entities:
@@ -39,26 +39,26 @@ export type NodeInputs = {
 
 
 export type ElementInputs = {
-  elasticity?: Map<number, number>;
-  shearModulus?: Map<number, number>;
-  area?: Map<number, number>;
-  momentOfInertiaZ?: Map<number, number>;
-  momentOfInertiaY?: Map<number, number>;
-  torsionalConstant?: Map<number, number>;
+  elasticities?: Map<number, number>;
+  shearModuli?: Map<number, number>;
+  areas?: Map<number, number>;
+  momentsOfInertiaZ?: Map<number, number>;
+  momentsOfInertiaY?: Map<number, number>;
+  torsionalConstants?: Map<number, number>;
 };
 
-export type NodeOutputs = {
-  deformation?: Map<number, [number, number, number, number, number, number]>;
-  reaction?: Map<number, [number, number, number, number, number, number]>;
+export type DeformOutputs = {
+  deformations?: Map<number, [number, number, number, number, number, number]>;
+  reactions?: Map<number, [number, number, number, number, number, number]>;
 };
 
-export type ElementOutputs = {
-  normal?: Map<number, [number, number]>;
-  shearY?: Map<number, [number, number]>;
-  shearZ?: Map<number, [number, number]>;
-  torsion?: Map<number, [number, number]>;
-  bendingY?: Map<number, [number, number]>;
-  bendingZ?: Map<number, [number, number]>;
+export type AnalyzeOutputs = {
+  normals?: Map<number, [number, number]>;
+  shearsY?: Map<number, [number, number]>;
+  shearsZ?: Map<number, [number, number]>;
+  torsions?: Map<number, [number, number]>;
+  bendingsY?: Map<number, [number, number]>;
+  bendingsZ?: Map<number, [number, number]>;
 };
 
 // High-order Model

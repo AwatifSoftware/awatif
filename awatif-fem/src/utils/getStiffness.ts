@@ -1,17 +1,17 @@
-import { MaterialInput, SectionInput } from "awatif-data-structure";
+import { ElementInputs } from "awatif-data-structure";
 import { matrix } from "mathjs";
 
 export function getStiffness(
-  section?: SectionInput,
-  material?: MaterialInput,
-  Length?: number
+  elementInputs: ElementInputs,
+  index: number,
+  Length: number
 ): number[][] {
-  const Iz = section?.momentOfInertiaZ ?? 0;
-  const Iy = section?.momentOfInertiaY ?? 0;
-  const E = material?.elasticity ?? 0;
-  const A = section?.area ?? 0;
-  const G = material?.shearModulus ?? 0;
-  const J = section?.torsionalConstant ?? 0;
+  const Iz = elementInputs?.momentsOfInertiaZ?.get(index) ?? 0;
+  const Iy = elementInputs?.momentsOfInertiaY?.get(index) ?? 0;
+  const E = elementInputs?.elasticities?.get(index) ?? 0;
+  const A = elementInputs?.areas?.get(index) ?? 0;
+  const G = elementInputs?.shearModuli?.get(index) ?? 0;
+  const J = elementInputs?.torsionalConstants?.get(index) ?? 0;
   const L = Length ?? 1;
 
   const EA = (E * A) / L;

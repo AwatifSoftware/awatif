@@ -1,4 +1,4 @@
-import { AnalysisInputs, Node, Element } from "awatif-data-structure";
+import { Node, Element, ElementInputs } from "awatif-data-structure";
 import { multiply, norm, subtract, transpose } from "mathjs";
 import { getTransformationMatrix } from "./getTransformationMatrix";
 import { getStiffness } from "./getStiffness";
@@ -6,8 +6,7 @@ import { getStiffness } from "./getStiffness";
 export function getStiffnesses(
   nodes: Node[],
   elements: Element[],
-  materials: AnalysisInputs["materials"],
-  sections: AnalysisInputs["sections"],
+  elementInputs: ElementInputs,
   dof: number
 ): number[][] {
   let stiffnesses = Array(dof)
@@ -21,7 +20,7 @@ export function getStiffnesses(
     const xi1 = nodes[e1];
     const L = norm(subtract(xi1, xi0)) as number;
 
-    const kLocal = getStiffness(sections?.get(index), materials?.get(index), L);
+    const kLocal = getStiffness(elementInputs, index, L);
     const T = getTransformationMatrix(xi0, xi1);
     const kGlobal = multiply(transpose(T), multiply(kLocal, T));
 

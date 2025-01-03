@@ -1,8 +1,8 @@
-import { AnalysisInputs, Element } from "awatif-data-structure";
+import { Element, ElementInputs, NodeInputs } from "awatif-data-structure";
 
 export function getFreeIndices(
-  supportsInputs: AnalysisInputs["pointSupports"],
-  sectionInputs: AnalysisInputs["sections"],
+  supportsInputs: NodeInputs["supports"],
+  elementInputs: ElementInputs,
   elements: Element[],
   dof: number
 ): number[] {
@@ -16,9 +16,17 @@ export function getFreeIndices(
     if (support[5]) supportsIndexes.push(index * 6 + 5);
   });
 
+  // Todo: find a cleaner way to incorporate bar and beams
   const barNodes = new Set<number>();
-  sectionInputs?.forEach((section, index) => {
-    if (!section.momentOfInertiaY && !section.momentOfInertiaZ) {
+  elementInputs?.momentsOfInertiaY?.forEach((momentOfInertiaY, index) => {
+    if (!momentOfInertiaY) {
+      const element = elements[index];
+      barNodes.add(element[0]);
+      barNodes.add(element[1]);
+    }
+  });
+  elementInputs?.momentsOfInertiaZ?.forEach((momentOfInertiaZ, index) => {
+    if (!momentOfInertiaZ) {
       const element = elements[index];
       barNodes.add(element[0]);
       barNodes.add(element[1]);

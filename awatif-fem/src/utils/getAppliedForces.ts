@@ -1,7 +1,7 @@
-import { AnalysisInputs } from "awatif-data-structure";
+import { NodeInputs } from "awatif-data-structure";
 
 export function getAppliedForces(
-  forcesInputs: AnalysisInputs["pointLoads"],
+  forcesInputs: NodeInputs["loads"],
   dof: number
 ): number[] {
   const forces: number[] = Array(dof).fill(0);
