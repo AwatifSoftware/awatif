@@ -8,8 +8,8 @@ import { IResultObject } from "./resultObjects/IResultObject";
 import { NodeResult } from "./resultObjects/NodeResult";
 
 export enum ResultType {
-  deformation = "deformation",
-  reaction = "reaction",
+  deformations = "deformations",
+  reactions = "reactions",
 }
 
 export function nodeResults(
@@ -34,11 +34,13 @@ export function nodeResults(
     const resultType =
       ResultType[settings.nodeResults.rawVal as keyof typeof ResultType];
 
-    structure.analysisOutputs?.val.nodes?.forEach((output, index) => {
+    console.log(settings.nodeResults.rawVal);
+
+    structure.deformOutputs?.val[resultType]?.forEach((output, index) => {
       const nodeResult = new NodeResult(
         derivedNodes.rawVal[index],
         resultType,
-        output[resultType] ?? [0, 0, 0, 0, 0, 0]
+        output ?? [0, 0, 0, 0, 0, 0]
       );
 
       nodeResult.updateScale(size * derivedDisplayScale.rawVal);

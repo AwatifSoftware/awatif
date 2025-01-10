@@ -75,9 +75,9 @@ export function viewer({
 
     return (
       structure?.nodes?.val.map((node, index) => {
-        const d = structure?.analysisOutputs?.val.nodes
+        const d = structure?.deformOutputs?.val.deformations
           ?.get(index)
-          ?.deformation?.slice(0, 3) ?? [0, 0, 0];
+          ?.slice(0, 3) ?? [0, 0, 0];
         return node.map((n, i) => n + d[i]) as Node;
       }) ?? []
     );
@@ -155,8 +155,10 @@ export function viewer({
   van.derive(() => {
     structure?.nodes?.val;
     structure?.elements?.val;
-    structure?.analysisInputs?.val;
-    structure?.analysisInputs?.val;
+    structure?.nodeInputs?.val;
+    structure?.elementInputs?.val;
+    structure?.deformOutputs?.val;
+    structure?.analyzeOutputs?.val;
 
     settings.displayScale.val;
     settings.nodes.val;

@@ -57,33 +57,33 @@ export function settings(
     });
   }
 
-  if (structure.analysisInputs) {
+  if (structure.nodeInputs || structure.elementInputs) {
     const inputs = pane.addFolder({ title: "Analysis Inputs" });
 
     inputs.addBinding(settingsState.supports, "val", { label: "Supports" });
     inputs.addBinding(settingsState.loads, "val", { label: "Loads" });
   }
 
-  if (structure.analysisOutputs) {
+  if (structure.deformOutputs || structure.analyzeOutputs) {
     const outputs = pane.addFolder({ title: "Analysis Outputs" });
 
     outputs.addBinding(settingsState.elementResults, "val", {
       options: {
         none: "none",
-        normal: "normal",
-        shearY: "shearY",
-        shearZ: "shearZ",
-        torsion: "torsion",
-        bendingY: "bendingY",
-        bendingZ: "bendingZ",
+        normals: "normals",
+        shearsY: "shearsY",
+        shearsZ: "shearsZ",
+        torsions: "torsions",
+        bendingsY: "bendingsY",
+        bendingsZ: "bendingsZ",
       },
       label: "Element results",
     });
     outputs.addBinding(settingsState.nodeResults, "val", {
       options: {
         none: "none",
-        deformation: "deformation",
-        reaction: "reaction",
+        deformations: "deformations",
+        reactions: "reactions",
       },
       label: "Node results",
     });

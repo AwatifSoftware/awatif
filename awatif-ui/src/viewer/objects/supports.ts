@@ -23,7 +23,7 @@ export function supports(
 
     group.clear();
 
-    structure.analysisInputs?.val.pointSupports?.forEach((_, index) => {
+    structure.nodeInputs?.val.supports?.forEach((_, index) => {
       const sphere = new THREE.Mesh(geometry, material);
 
       sphere.position.set(...derivedNodes.rawVal[index]);

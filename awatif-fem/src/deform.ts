@@ -43,6 +43,8 @@ export function deform(
   const reactions: DeformOutputs["reactions"] = new Map();
 
   nodes.forEach((_, i) => {
+    const hasReaction = nodeInputs.supports?.get(i);
+
     deformations.set(i, [
       deformationsArray[i * 6],
       deformationsArray[i * 6 + 1],
@@ -52,14 +54,16 @@ export function deform(
       deformationsArray[i * 6 + 5],
     ]);
 
-    reactions.set(i, [
-      reactionsArray[i * 6],
-      reactionsArray[i * 6 + 1],
-      reactionsArray[i * 6 + 2],
-      reactionsArray[i * 6 + 3],
-      reactionsArray[i * 6 + 4],
-      reactionsArray[i * 6 + 5],
-    ]);
+    if (hasReaction) {
+      reactions.set(i, [
+        reactionsArray[i * 6],
+        reactionsArray[i * 6 + 1],
+        reactionsArray[i * 6 + 2],
+        reactionsArray[i * 6 + 3],
+        reactionsArray[i * 6 + 4],
+        reactionsArray[i * 6 + 5],
+      ]);
+    }
   });
 
   return {

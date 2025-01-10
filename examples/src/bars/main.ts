@@ -2,10 +2,12 @@ import van, { State } from "vanjs-core";
 import {
   Node,
   Element,
-  AnalysisInputs,
-  AnalysisOutputs,
+  NodeInputs,
+  ElementInputs,
+  DeformOutputs,
+  AnalyzeOutputs,
 } from "awatif-data-structure";
-import { analyze } from "awatif-fem";
+import { deform, analyze } from "awatif-fem";
 import { Parameters, parameters, viewer } from "awatif-ui";
 
 // Init
@@ -16,8 +18,16 @@ const params: Parameters = {
 
 const nodes: State<Node[]> = van.state([]);
 const elements: State<Element[]> = van.state([]);
-const analysisInputs: State<AnalysisInputs> = van.state({});
-const analysisOutputs: State<AnalysisOutputs> = van.state({});
+const nodeInputs: State<NodeInputs> = van.state({
+  supports: new Map(),
+  loads: new Map(),
+});
+const elementInputs: State<ElementInputs> = van.state({
+  areas: new Map(),
+  elasticities: new Map(),
+});
+const deformOutputs: State<DeformOutputs> = van.state({});
+const analyzeOutputs: State<AnalyzeOutputs> = van.state({});
 
 // Events: on parameter change
 van.derive(() => {
@@ -30,23 +40,38 @@ van.derive(() => {
     [0, 1],
     [1, 2],
   ];
-  analysisInputs.val = {
-    materials: new Map([
-      [0, { elasticity: 200 }],
-      [1, { elasticity: 200 }],
-    ]),
-    sections: new Map([
-      [0, { area: 100 }],
-      [1, { area: 100 }],
-    ]),
-    pointSupports: new Map([
+
+  nodeInputs.val = {
+    supports: new Map([
       [0, [true, true, true, true, true, true]],
       [2, [true, true, true, true, true, true]],
     ]),
-    pointLoads: new Map([[1, [0, 0, -1e3, 0, 0, 0]]]),
+    loads: new Map([[1, [0, 0, -1e3, 0, 0, 0]]]),
+  };
+  elementInputs.val = {
+    elasticities: new Map([
+      [0, 200],
+      [1, 200],
+    ]),
+    areas: new Map([
+      [0, 100],
+      [1, 100],
+    ]),
   };
 
-  analysisOutputs.val = analyze(nodes.val, elements.val, analysisInputs.val);
+  deformOutputs.val = deform(
+    nodes.val,
+    elements.val,
+    nodeInputs.val,
+    elementInputs.val
+  );
+
+  analyzeOutputs.val = analyze(
+    nodes.val,
+    elements.val,
+    elementInputs.val,
+    deformOutputs.val
+  );
 });
 
 document.body.append(
@@ -55,8 +80,10 @@ document.body.append(
     structure: {
       nodes,
       elements,
-      analysisInputs,
-      analysisOutputs,
+      nodeInputs,
+      elementInputs,
+      deformOutputs,
+      analyzeOutputs,
     },
     settingsObj: {
       gridSize: 1000,

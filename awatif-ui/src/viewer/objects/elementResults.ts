@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import van, { State } from "vanjs-core";
-import { AnalysisOutputs, Node } from "awatif-data-structure";
+import { AnalyzeOutputs, Node } from "awatif-data-structure";
 import { Structure } from "awatif-data-structure";
 import { Settings } from "../settings/settings";
 
@@ -10,12 +10,12 @@ import { LinearResult } from "./resultObjects/LinearResult";
 import { IResultObject } from "./resultObjects/IResultObject";
 
 enum ResultType {
-  normal = "normal",
-  shearY = "shearY",
-  shearZ = "shearZ",
-  torsion = "torsion",
-  bendingY = "bendingY",
-  bendingZ = "bendingZ",
+  normals = "normals",
+  shearsY = "shearsY",
+  shearsZ = "shearsZ",
+  torsions = "torsions",
+  bendingsY = "bendingsY",
+  bendingsZ = "bendingsZ",
 }
 
 export function elementResults(
@@ -28,12 +28,12 @@ export function elementResults(
   const group = new THREE.Group();
   const size = 0.05 * settings.gridSize.rawVal;
   const resultObjects = {
-    [ResultType.normal]: ConstantResult,
-    [ResultType.shearY]: ConstantResult,
-    [ResultType.shearZ]: ConstantResult,
-    [ResultType.torsion]: ConstantResult,
-    [ResultType.bendingY]: LinearResult,
-    [ResultType.bendingZ]: LinearResult,
+    [ResultType.normals]: ConstantResult,
+    [ResultType.shearsY]: ConstantResult,
+    [ResultType.shearsZ]: ConstantResult,
+    [ResultType.torsions]: ConstantResult,
+    [ResultType.bendingsY]: LinearResult,
+    [ResultType.bendingsZ]: LinearResult,
   };
 
   // on settings.elementResults & deformedShape, model clear and create visuals
@@ -48,18 +48,15 @@ export function elementResults(
     const resultType =
       ResultType[settings.elementResults.rawVal as keyof typeof ResultType];
 
-    structure.analysisOutputs?.val.elements?.forEach((result, index) => {
+    structure.analyzeOutputs?.val[resultType]?.forEach((result, index) => {
       const element = structure.elements?.rawVal[index] ?? [0, 1]; // TODO: improve this
       const node1 = derivedNodes.rawVal[element[0]];
       const node2 = derivedNodes.rawVal[element[1]];
       const length = new THREE.Vector3(...node2).distanceTo(
         new THREE.Vector3(...node1)
       );
-      const maxResult = findMax(
-        structure.analysisOutputs?.rawVal.elements,
-        resultType
-      );
-      const normalizedResult = result[resultType]?.map(
+      const maxResult = findMax(structure.analyzeOutputs?.rawVal[resultType]);
+      const normalizedResult = result?.map(
         (n) => n / (maxResult === 0 ? 1 : maxResult)
       );
       const rotation = getTransformationMatrix(node1, node2);
@@ -68,13 +65,13 @@ export function elementResults(
         node2,
         length,
         rotation,
-        result[resultType] ?? [0, 0],
+        result ?? [0, 0],
         normalizedResult ?? [0, 0],
         [
-          ResultType.normal,
-          ResultType.shearZ,
-          ResultType.torsion,
-          ResultType.bendingY,
+          ResultType.normals,
+          ResultType.shearsZ,
+          ResultType.torsions,
+          ResultType.bendingsY,
         ].includes(resultType)
           ? true
           : false
@@ -105,16 +102,13 @@ export function elementResults(
   return group;
 }
 
-function findMax(
-  nodeOutputs: AnalysisOutputs["elements"],
-  resultType: ResultType
-): number {
-  let maxDeformation: number = 0;
+function findMax(nodeOutputs: AnalyzeOutputs[ResultType]): number {
+  let max: number = 0;
 
   nodeOutputs?.forEach((node) => {
-    const maxInNode = Math.max(...(node[resultType] ?? [0, 0]));
-    if (maxInNode > maxDeformation) maxDeformation = maxInNode;
+    const maxInNode = Math.max(...(node ?? [0, 0]));
+    if (maxInNode > max) max = maxInNode;
   });
 
-  return maxDeformation;
+  return max;
 }

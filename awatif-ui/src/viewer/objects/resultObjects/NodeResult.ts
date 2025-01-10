@@ -22,7 +22,7 @@ export class NodeResult extends THREE.Group implements IResultObject {
   ) {
     super();
     // init
-    const isR = resultType === ResultType.reaction;
+    const isR = resultType === ResultType.reactions;
     if (result[0])
       this.xText1 = new Text(`${isR ? "Fx" : "Dx"}: ` + result[0].toFixed(4));
     if (result[3])
