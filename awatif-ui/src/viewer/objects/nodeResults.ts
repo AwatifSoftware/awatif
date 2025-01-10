@@ -34,8 +34,6 @@ export function nodeResults(
     const resultType =
       ResultType[settings.nodeResults.rawVal as keyof typeof ResultType];
 
-    console.log(settings.nodeResults.rawVal);
-
     structure.deformOutputs?.val[resultType]?.forEach((output, index) => {
       const nodeResult = new NodeResult(
         derivedNodes.rawVal[index],

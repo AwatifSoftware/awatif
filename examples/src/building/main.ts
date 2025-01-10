@@ -1,10 +1,5 @@
 import van, { State } from "vanjs-core";
-import {
-  Node,
-  Element,
-  AnalysisInputs,
-  AnalysisOutputs,
-} from "awatif-data-structure";
+import { Node, Element } from "awatif-data-structure";
 import { parameters, Parameters, viewer } from "awatif-ui";
 
 // Init
@@ -59,8 +54,6 @@ const params: Parameters = {
 
 const nodesState: State<Node[]> = van.state([]);
 const elementsState: State<Element[]> = van.state([]);
-const analysisInputsState: State<AnalysisInputs> = van.state({});
-const analysisOutputsState: State<AnalysisOutputs> = van.state({});
 
 // Events: on parameter change
 van.derive(() => {
@@ -216,8 +209,6 @@ document.body.append(
     structure: {
       nodes: nodesState,
       elements: elementsState,
-      analysisInputs: analysisInputsState,
-      analysisOutputs: analysisOutputsState,
     },
     settingsObj: {
       nodes: false,

@@ -1,11 +1,13 @@
 import van, { State } from "vanjs-core";
 import {
-  AnalysisInputs,
   Node,
   Element,
-  AnalysisOutputs,
+  NodeInputs,
+  ElementInputs,
+  DeformOutputs,
+  AnalyzeOutputs,
 } from "awatif-data-structure";
-import { analyze } from "awatif-fem";
+import { analyze, deform } from "awatif-fem";
 import { parameters, Parameters, viewer } from "awatif-ui";
 import { createTruss } from "./createTruss";
 
@@ -141,8 +143,10 @@ export const params: Parameters = {
 
 const nodesState: State<Node[]> = van.state([]);
 const elementsState: State<Element[]> = van.state([]);
-const analysisInputsState: State<AnalysisInputs> = van.state({});
-const analysisOutputsState: State<AnalysisOutputs> = van.state({});
+const nodeInputsState: State<NodeInputs> = van.state({});
+const elementInputsState: State<ElementInputs> = van.state({});
+const deformOutputsState: State<DeformOutputs> = van.state({});
+const analyzeOutputsState: State<AnalyzeOutputs> = van.state({});
 
 // Events: on parameter change
 van.derive(() => {
@@ -390,41 +394,38 @@ van.derive(() => {
     }
   }
 
-  const analysisInputs: AnalysisInputs = {
-    materials: new Map(),
-    sections: new Map(),
-    pointSupports: new Map(),
-    pointLoads: new Map(),
+  // Supports and loads
+  const nodeInputs: NodeInputs = {
+    supports: new Map(
+      supportIndices.map((i) => [i, [true, true, true, true, true, true]])
+    ),
+    loads: new Map(
+      loadIndices.map((i) => [i, [0, 0, -uniformLoad * spacing, 0, 0, 0]])
+    ),
   };
 
-  // analysisInputs - supports
-  supportIndices.forEach((i) =>
-    analysisInputs.pointSupports?.set(i, [true, true, true, true, true, true])
-  );
+  const elementInputs: ElementInputs = {
+    elasticities: new Map([
+      ...(chordsIndices.map((i) => [i, chordsElasticity]) as any),
+      ...(websIndices.map((i) => [i, websElasticity]) as any),
+    ]),
+    areas: new Map([
+      ...(chordsIndices.map((i) => [i, chordsArea]) as any),
+      ...(websIndices.map((i) => [i, websArea]) as any),
+    ]),
+  };
 
-  // analysisInputs - loads
-  loadIndices.forEach((i) =>
-    analysisInputs.pointLoads?.set(i, [0, 0, -uniformLoad * spacing, 0, 0, 0])
-  );
+  const deformOutputs = deform(nodes, elements, nodeInputs, elementInputs);
 
-  // analysisInputs - properties
-  chordsIndices.forEach((i) => {
-    analysisInputs.materials?.set(i, { elasticity: chordsElasticity });
-    analysisInputs.sections?.set(i, { area: chordsArea });
-  });
-
-  websIndices.forEach((i) => {
-    analysisInputs.materials?.set(i, { elasticity: websArea });
-    analysisInputs.sections?.set(i, { area: websElasticity });
-  });
-
-  const analysisOutputs = analyze(nodes, elements, analysisInputs);
+  const analyzeOutputs = analyze(nodes, elements, elementInputs, deformOutputs);
 
   // update state
   nodesState.val = nodes;
   elementsState.val = elements;
-  analysisInputsState.val = analysisInputs;
-  analysisOutputsState.val = analysisOutputs;
+  nodeInputsState.val = nodeInputs;
+  elementInputsState.val = elementInputs;
+  deformOutputsState.val = deformOutputs;
+  analyzeOutputsState.val = analyzeOutputs;
 });
 
 document.body.append(
@@ -433,8 +434,10 @@ document.body.append(
     structure: {
       nodes: nodesState,
       elements: elementsState,
-      analysisInputs: analysisInputsState,
-      analysisOutputs: analysisOutputsState,
+      nodeInputs: nodeInputsState,
+      elementInputs: elementInputsState,
+      deformOutputs: deformOutputsState,
+      analyzeOutputs: analyzeOutputsState,
     },
     settingsObj: {
       deformedShape: true,

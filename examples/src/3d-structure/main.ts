@@ -2,10 +2,12 @@ import van, { State } from "vanjs-core";
 import {
   Node,
   Element,
-  AnalysisInputs,
-  AnalysisOutputs,
+  NodeInputs,
+  ElementInputs,
+  DeformOutputs,
+  AnalyzeOutputs,
 } from "awatif-data-structure";
-import { analyze } from "awatif-fem";
+import { analyze, deform } from "awatif-fem";
 import { parameters, Parameters, viewer } from "awatif-ui";
 
 // Init
@@ -48,8 +50,10 @@ const params: Parameters = {
 
 const nodesState: State<Node[]> = van.state([]);
 const elementsState: State<Element[]> = van.state([]);
-const analysisInputsState: State<AnalysisInputs> = van.state({});
-const analysisOutputsState: State<AnalysisOutputs> = van.state({});
+const nodeInputsState: State<NodeInputs> = van.state({});
+const elementInputsState: State<ElementInputs> = van.state({});
+const deformOutputsState: State<DeformOutputs> = van.state({});
+const analyzeOutputsState: State<AnalyzeOutputs> = van.state({});
 
 // Events: on parameter change
 van.derive(() => {
@@ -90,38 +94,36 @@ van.derive(() => {
     elements.push([i, i + 7], [i + 1, i + 6]);
   }
 
-  const analysisInputs: AnalysisInputs = {
-    materials: new Map(),
-    sections: new Map(),
-    pointLoads: new Map(),
-    pointSupports: new Map(),
+  // supports and loads
+  const fixed: any = [true, true, true, true, true, true];
+  const nodeInputs: NodeInputs = {
+    supports: new Map([
+      [0, fixed],
+      [1, fixed],
+      [2, fixed],
+      [3, fixed],
+    ]),
+    loads: new Map([
+      [nodes.length - 2, [params.load.value.val, 0, 0, 0, 0, 0]],
+    ]),
   };
 
-  elements.forEach((_, i) => {
-    analysisInputs.materials?.set(i, { elasticity: 100 });
-    analysisInputs.sections?.set(i, { area: 10 });
-  });
-  const fixed: any = [true, true, true, true, true, true];
-  analysisInputs.pointSupports?.set(0, fixed);
-  analysisInputs.pointSupports?.set(1, fixed);
-  analysisInputs.pointSupports?.set(2, fixed);
-  analysisInputs.pointSupports?.set(3, fixed);
-  analysisInputs.pointLoads?.set(nodes.length - 2, [
-    params.load.value.val,
-    0,
-    0,
-    0,
-    0,
-    0,
-  ]);
+  const elementInputs: ElementInputs = {
+    elasticities: new Map(elements.map((_, i) => [i, 100])),
+    areas: new Map(elements.map((_, i) => [i, 10])),
+  };
 
-  const analysisOutputs = analyze(nodes, elements, analysisInputs);
+  const deformOutputs = deform(nodes, elements, nodeInputs, elementInputs);
+
+  const analyzeOutputs = analyze(nodes, elements, elementInputs, deformOutputs);
 
   // update state
   nodesState.val = nodes;
   elementsState.val = elements;
-  analysisInputsState.val = analysisInputs;
-  analysisOutputsState.val = analysisOutputs;
+  nodeInputsState.val = nodeInputs;
+  elementInputsState.val = elementInputs;
+  deformOutputsState.val = deformOutputs;
+  analyzeOutputsState.val = analyzeOutputs;
 });
 
 document.body.append(
@@ -130,8 +132,10 @@ document.body.append(
     structure: {
       nodes: nodesState,
       elements: elementsState,
-      analysisInputs: analysisInputsState,
-      analysisOutputs: analysisOutputsState,
+      nodeInputs: nodeInputsState,
+      elementInputs: elementInputsState,
+      deformOutputs: deformOutputsState,
+      analyzeOutputs: analyzeOutputsState,
     },
     settingsObj: {
       deformedShape: true,

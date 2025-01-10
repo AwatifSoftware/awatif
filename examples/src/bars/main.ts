@@ -18,14 +18,8 @@ const params: Parameters = {
 
 const nodes: State<Node[]> = van.state([]);
 const elements: State<Element[]> = van.state([]);
-const nodeInputs: State<NodeInputs> = van.state({
-  supports: new Map(),
-  loads: new Map(),
-});
-const elementInputs: State<ElementInputs> = van.state({
-  areas: new Map(),
-  elasticities: new Map(),
-});
+const nodeInputs: State<NodeInputs> = van.state({});
+const elementInputs: State<ElementInputs> = van.state({});
 const deformOutputs: State<DeformOutputs> = van.state({});
 const analyzeOutputs: State<AnalyzeOutputs> = van.state({});
 

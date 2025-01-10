@@ -102,7 +102,6 @@ export function drawing({
     raycaster.setFromCamera(pointer, camera);
     const intersect = raycaster.intersectObject(plane);
 
-    console.log("delete");
     indicationPoint.geometry.deleteAttribute("position"); // delete point if not intersection
 
     if (intersect.length) {

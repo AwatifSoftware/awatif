@@ -1,11 +1,6 @@
 import van, { State } from "vanjs-core";
 import * as THREE from "three";
-import {
-  Node,
-  Element,
-  AnalysisInputs,
-  AnalysisOutputs,
-} from "awatif-data-structure";
+import { Node, Element, NodeInputs } from "awatif-data-structure";
 import { parameters, Parameters, viewer } from "awatif-ui";
 
 // Init
@@ -54,8 +49,7 @@ const params: Parameters = {
 
 const nodesState: State<Node[]> = van.state([]);
 const elementsState: State<Element[]> = van.state([]);
-const analysisInputsState: State<AnalysisInputs> = van.state({});
-const analysisOutputsState: State<AnalysisOutputs> = van.state({});
+const nodeInputsState: State<NodeInputs> = van.state({});
 
 // Events: on parameter change
 van.derive(() => {
@@ -106,22 +100,23 @@ van.derive(() => {
     (i) => (xDivisions + 1) * i + xDivisions
   );
 
-  const analysisInputs: AnalysisInputs = {
-    pointSupports: new Map(),
+  const nodeInputs: NodeInputs = {
+    supports: new Map([
+      ...(startSupports.map((i) => [
+        i,
+        [true, true, true, true, true, true],
+      ]) as any),
+      ...(endSupports.map((i) => [
+        i,
+        [true, true, true, true, true, true],
+      ]) as Array<[number, boolean[]]>),
+    ]),
   };
-
-  startSupports.forEach((i) =>
-    analysisInputs.pointSupports?.set(i, [true, true, true, true, true, true])
-  );
-
-  endSupports.forEach((i) =>
-    analysisInputs.pointSupports?.set(i, [true, true, true, true, true, true])
-  );
 
   // update state
   nodesState.val = nodes;
   elementsState.val = elements;
-  analysisInputsState.val = analysisInputs;
+  nodeInputsState.val = nodeInputs;
 });
 
 document.body.append(
@@ -130,8 +125,7 @@ document.body.append(
     structure: {
       nodes: nodesState,
       elements: elementsState,
-      analysisInputs: analysisInputsState,
-      analysisOutputs: analysisOutputsState,
+      nodeInputs: nodeInputsState,
     },
   })
 );
