@@ -19,6 +19,8 @@ import { nodeResults } from "./objects/nodeResults";
 
 import "./styles.css";
 import { drawing, Drawing } from "./drawing/drawing";
+import { report } from "./report/report";
+
 
 export type SettingsObj = {
   gridSize?: number;
@@ -41,11 +43,16 @@ export function viewer({
   settingsObj,
   objects3D,
   drawingObj,
+  reportObj,
 }: {
   structure?: Structure;
   settingsObj?: SettingsObj;
   objects3D?: State<THREE.Object3D[]>;
   drawingObj?: Drawing;
+  reportObj: {
+    template: (data: object) => HTMLDivElement;
+    data: object;
+  };
 }): HTMLDivElement {
   // init
   THREE.Object3D.DEFAULT_UP = new THREE.Vector3(0, 0, 1);
@@ -104,6 +111,9 @@ export function viewer({
     grid(settings.gridSize.rawVal),
     axes(settings.gridSize.rawVal, settings.flipAxes.rawVal)
   );
+
+  // Append the report function to the viewer element
+  if (reportObj) viewerElm.appendChild(report(reportObj));
 
   if (structure)
     scene.add(
