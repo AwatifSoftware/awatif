@@ -58,6 +58,10 @@ export function drawing({
   indicationPoint.frustumCulled = false;
   scene.add(indicationPoint);
 
+  // to start with an empty polyline
+  if (drawingObj.polylines)
+    drawingObj.polylines.val = [...drawingObj.polylines.rawVal, []];
+
   // Match initial grid position and rotation
   plane.position.set(0.5 * gridSize, 0.5 * gridSize, 0);
   plane.rotateX(Math.PI / 2);
@@ -119,7 +123,7 @@ export function drawing({
   });
 
   // On pointer click add a point
-  window.addEventListener("pointerup", (event: PointerEvent) => {
+  window.addEventListener("click", (event: PointerEvent) => {
     // handle when rotation and click happen together
     if (pointerDownAndMovedCount > 5) {
       pointerDownAndMovedCount = 0;
@@ -137,7 +141,31 @@ export function drawing({
         ...drawingObj.points.rawVal,
         intersect[0].point.toArray(),
       ];
+
+      if (drawingObj.polylines) {
+        drawingObj.polylines.val = [
+          ...drawingObj.polylines.rawVal.slice(0, -1),
+          [
+            ...(drawingObj.polylines.rawVal.length
+              ? drawingObj.polylines.rawVal.pop()
+              : []),
+            drawingObj.points.rawVal.length - 1,
+          ],
+        ];
+      }
     }
+  });
+
+  // On pointer contextmenu add a new empty polyline
+  window.addEventListener("contextmenu", () => {
+    if (
+      !drawingObj.polylines ||
+      drawingObj.polylines.rawVal[drawingObj.polylines.rawVal.length - 1]
+        .length === 0
+    )
+      return;
+
+    drawingObj.polylines.val = [...drawingObj.polylines.rawVal, []];
   });
 
   // On pointer move and intersection with plan show indication point
@@ -157,6 +185,16 @@ export function drawing({
     }
 
     viewerRender();
+  });
+
+  // On pointer move and intersection with a point hide indication point
+  window.addEventListener("pointermove", (event: PointerEvent) => {
+    pointer.x = (event.clientX / window.innerWidth) * 2 - 1;
+    pointer.y = -(event.clientY / window.innerHeight) * 2 + 1;
+    raycaster.setFromCamera(pointer, camera);
+    const intersect = raycaster.intersectObject(points);
+
+    indicationPoint.visible = intersect.length ? false : true;
   });
 
   // On pointer drag and intersection with a point update point position
@@ -193,16 +231,6 @@ export function drawing({
   window.addEventListener("pointerup", () => {
     controls.enabled = true;
     intersectWithPoint = false;
-  });
-
-  // On pointer move and intersection with a point hide indication point
-  window.addEventListener("pointermove", (event: PointerEvent) => {
-    pointer.x = (event.clientX / window.innerWidth) * 2 - 1;
-    pointer.y = -(event.clientY / window.innerHeight) * 2 + 1;
-    raycaster.setFromCamera(pointer, camera);
-    const intersect = raycaster.intersectObject(points);
-
-    indicationPoint.visible = intersect.length ? false : true;
   });
 }
 

@@ -8,8 +8,15 @@
       import { viewer } from "../viewer";
       import van from "vanjs-core";
 
-      const points = van.state([[10, 0, 0]]);
+      const points = van.state([
+        [10, 0, 0],
+        [10, 10, 0],
+        [5, 5, 0],
+      ]);
+      const polylines = van.state([[0, 1, 2]]);
+
       const nodes = van.state([]);
+      const elements = van.state([]);
 
       // default grid target
       const gridTarget = van.state({
@@ -17,8 +24,10 @@
         rotation: [Math.PI / 2, 0, 0],
       });
 
+      // on drawing change update nodes and elements
       van.derive(() => {
         nodes.val = points.val;
+        elements.val = polylines.val;
       });
 
       // simulate change of grid target
@@ -32,9 +41,11 @@
       const viewerElm = viewer({
         structure: {
           nodes,
+          elements,
         },
         drawingObj: {
           points,
+          polylines,
           gridTarget,
         },
       });
