@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import { int } from "three/webgpu";
 import van, { State } from "vanjs-core";
 
 export type Drawing = {
@@ -58,17 +59,18 @@ export function drawing({
   indicationPoint.frustumCulled = false;
   scene.add(indicationPoint);
 
-  // to start with an empty polyline
-  if (drawingObj.polylines)
-    drawingObj.polylines.val = [...drawingObj.polylines.rawVal, []];
-
   // Match initial grid position and rotation
   plane.position.set(0.5 * gridSize, 0.5 * gridSize, 0);
   plane.rotateX(Math.PI / 2);
   plane.geometry.rotateX(Math.PI / 2);
   plane.updateMatrixWorld(); // to fix intersect object
 
-  // On gridTarget change: interpolate grid and update plane position and rotation
+  // To start with an empty polyline and keep the provided ones
+  if (drawingObj.polylines)
+    drawingObj.polylines.val = [...drawingObj.polylines.rawVal, []];
+
+  // Events
+  // On gridTarget change, interpolate grid and update plane position and rotation
   van.derive(() => {
     interpolate(
       gridObj,
@@ -88,7 +90,7 @@ export function drawing({
     plane.updateMatrixWorld(); // to fix intersect object
   });
 
-  // On points change update points positions for intersections
+  // On points change, update points positions for intersections
   van.derive(() => {
     points.geometry.setAttribute(
       "position",
@@ -105,7 +107,7 @@ export function drawing({
     raycaster.params.Points.threshold = 0.4 * size;
   });
 
-  // pointer events
+  // Pointer events
   let pointerdown = false;
   let pointerDownAndMovedCount = 0;
 
@@ -122,7 +124,7 @@ export function drawing({
     if (pointerdown) pointerDownAndMovedCount++;
   });
 
-  // On pointer click add a point
+  // On pointer click, add a point and polyline
   window.addEventListener("click", (event: PointerEvent) => {
     // handle when rotation and click happen together
     if (pointerDownAndMovedCount > 5) {
@@ -156,7 +158,7 @@ export function drawing({
     }
   });
 
-  // On pointer contextmenu add a new empty polyline
+  // On contextmenu, add a new empty polyline
   window.addEventListener("contextmenu", () => {
     if (
       !drawingObj.polylines ||
@@ -168,7 +170,7 @@ export function drawing({
     drawingObj.polylines.val = [...drawingObj.polylines.rawVal, []];
   });
 
-  // On pointer move and intersection with plan show indication point
+  // On pointer move and intersection with plan, show indication point
   window.addEventListener("pointermove", (event: PointerEvent) => {
     pointer.x = (event.clientX / window.innerWidth) * 2 - 1;
     pointer.y = -(event.clientY / window.innerHeight) * 2 + 1;
@@ -187,18 +189,31 @@ export function drawing({
     viewerRender();
   });
 
-  // On pointer move and intersection with a point hide indication point
+  // On pointer move and intersection with a point, hide indication point
   window.addEventListener("pointermove", (event: PointerEvent) => {
     pointer.x = (event.clientX / window.innerWidth) * 2 - 1;
     pointer.y = -(event.clientY / window.innerHeight) * 2 + 1;
     raycaster.setFromCamera(pointer, camera);
-    const intersect = raycaster.intersectObject(points);
 
-    indicationPoint.visible = intersect.length ? false : true;
+    // Check if point in the plane
+    let isPointInPlane = false;
+    const intersectWithPoints = raycaster.intersectObject(points);
+    const intersectWithPlane = raycaster.intersectObject(plane);
+    if (intersectWithPoints.length && intersectWithPlane.length) {
+      const point = new THREE.Vector3(
+        ...drawingObj.points.rawVal[intersectWithPoints[0].index]
+      );
+      const planePoint = new THREE.Vector3(...intersectWithPlane[0].point);
+      const planeToPoint = point.sub(planePoint);
+      const planeNormal = intersectWithPlane[0].face?.normal;
+      if (Math.abs(planeToPoint.dot(planeNormal)) < 1e-4) isPointInPlane = true;
+    }
+
+    indicationPoint.visible = isPointInPlane ? false : true;
   });
 
-  // On pointer drag and intersection with a point update point position
-  let intersectWithPoint = false;
+  // On pointer drag and intersection with a point and plane, update point position
+  let isPointInPlaneWithoutControl = false;
   let pointIndex: number | undefined;
   window.addEventListener("pointermove", (event: PointerEvent) => {
     if (!pointerDownAndMovedCount) return;
@@ -206,31 +221,41 @@ export function drawing({
     pointer.x = (event.clientX / window.innerWidth) * 2 - 1;
     pointer.y = -(event.clientY / window.innerHeight) * 2 + 1;
     raycaster.setFromCamera(pointer, camera);
-    const intersect = raycaster.intersectObject(points);
+
+    // Check if point in the plane
+    let isPointInPlane = false;
+    const intersectWithPoints = raycaster.intersectObject(points);
+    const intersectWithPlane = raycaster.intersectObject(plane);
+    if (intersectWithPoints.length && intersectWithPlane.length) {
+      const point = new THREE.Vector3(
+        ...drawingObj.points.rawVal[intersectWithPoints[0].index]
+      );
+      const planePoint = new THREE.Vector3(...intersectWithPlane[0].point);
+      const planeToPoint = point.sub(planePoint);
+      const planeNormal = intersectWithPlane[0].face?.normal;
+      if (Math.abs(planeToPoint.dot(planeNormal)) < 1e-4) isPointInPlane = true;
+    }
 
     // < 5 to not trigger with rotation
-    if (intersect.length && pointerDownAndMovedCount < 5) {
-      intersectWithPoint = true;
+    if (isPointInPlane && pointerDownAndMovedCount < 5) {
+      isPointInPlaneWithoutControl = true;
       controls.enabled = false;
-      pointIndex = intersect[0].index;
+      pointIndex = intersectWithPoints[0].index;
     }
 
-    if (intersectWithPoint) {
-      const intersect = raycaster.intersectObject(plane);
-      if (!intersect.length) return;
+    if (!isPointInPlaneWithoutControl) return;
 
-      if (pointerDownAndMovedCount % 2 !== 0) return; // slow movements for (parametric) performance opt 5
+    if (pointerDownAndMovedCount % 2 !== 0) return; // slow movements for (parametric) performance opt 5
 
-      const newPoints = [...drawingObj.points.rawVal];
-      if (pointIndex !== undefined)
-        newPoints[pointIndex] = intersect[0].point.toArray();
-      drawingObj.points.val = newPoints;
-    }
+    const newPoints = [...drawingObj.points.rawVal];
+    if (pointIndex !== undefined)
+      newPoints[pointIndex] = intersectWithPlane[0].point.toArray();
+    drawingObj.points.val = newPoints;
   });
 
   window.addEventListener("pointerup", () => {
     controls.enabled = true;
-    intersectWithPoint = false;
+    isPointInPlaneWithoutControl = false;
   });
 }
 
