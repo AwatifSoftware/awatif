@@ -158,8 +158,6 @@ export function viewer({
     settings.elementResults.val;
     settings.nodeResults.val;
 
-    objects3D?.val;
-
     setTimeout(viewerRender); // setTimeout to ensure render is called after all updates are done in that event tick
   });
 
@@ -169,6 +167,8 @@ export function viewer({
 
     scene.remove(...objects3D.oldVal);
     scene.add(...objects3D.rawVal);
+
+    viewerRender();
   });
 
   // Object's functions (Actions)
