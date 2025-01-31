@@ -1,1 +1,0 @@
-export { mesh } from "./mesh";
