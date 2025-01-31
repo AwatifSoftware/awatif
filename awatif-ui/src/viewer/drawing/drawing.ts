@@ -1,6 +1,7 @@
 import * as THREE from "three";
-import { int } from "three/webgpu";
 import van, { State } from "vanjs-core";
+
+// Todo: refactor isInPlane to a function
 
 export type Drawing = {
   points?: State<[number, number, number][]>;
@@ -206,6 +207,7 @@ export function drawing({
       const planePoint = new THREE.Vector3(...intersectWithPlane[0].point);
       const planeToPoint = point.sub(planePoint);
       const planeNormal = intersectWithPlane[0].face?.normal;
+      planeNormal.transformDirection(plane.matrixWorld);
       if (Math.abs(planeToPoint.dot(planeNormal)) < 1e-4) isPointInPlane = true;
     }
 
@@ -233,6 +235,7 @@ export function drawing({
       const planePoint = new THREE.Vector3(...intersectWithPlane[0].point);
       const planeToPoint = point.sub(planePoint);
       const planeNormal = intersectWithPlane[0].face?.normal;
+      planeNormal.transformDirection(plane.matrixWorld);
       if (Math.abs(planeToPoint.dot(planeNormal)) < 1e-4) isPointInPlane = true;
     }
 
@@ -256,6 +259,47 @@ export function drawing({
   window.addEventListener("pointerup", () => {
     controls.enabled = true;
     isPointInPlaneWithoutControl = false;
+  });
+
+  // On contextmenu move and point in the plane, delete the point and update polyline
+  window.addEventListener("contextmenu", (event: PointerEvent) => {
+    pointer.x = (event.clientX / window.innerWidth) * 2 - 1;
+    pointer.y = -(event.clientY / window.innerHeight) * 2 + 1;
+    raycaster.setFromCamera(pointer, camera);
+
+    // Check if point in the plane
+    let isPointInPlane = false;
+    const intersectWithPoints = raycaster.intersectObject(points);
+    const intersectWithPlane = raycaster.intersectObject(plane);
+    if (intersectWithPoints.length && intersectWithPlane.length) {
+      const point = new THREE.Vector3(
+        ...drawingObj.points.rawVal[intersectWithPoints[0].index]
+      );
+      const planePoint = new THREE.Vector3(...intersectWithPlane[0].point);
+      const planeToPoint = point.sub(planePoint);
+      const planeNormal = intersectWithPlane[0].face?.normal;
+      planeNormal.transformDirection(plane.matrixWorld);
+      if (Math.abs(planeToPoint.dot(planeNormal)) < 1e-4) isPointInPlane = true;
+    }
+
+    if (!isPointInPlane) return;
+
+    const newPoints = [...drawingObj.points.rawVal];
+    newPoints.splice(intersectWithPoints[0].index, 1);
+    drawingObj.points.val = newPoints;
+
+    const newPolylines = drawingObj.polylines.rawVal
+      .map((polyline) =>
+        polyline.filter((i) => i !== intersectWithPoints[0].index)
+      ) // remove point index from polyline
+      .map((polyline) =>
+        polyline.map((i) => (i > intersectWithPoints[0].index ? i - 1 : i))
+      ) // update polyline indices
+      .filter((polyline) => polyline.length); // remove empty polylines
+
+    newPolylines.push([]); // add new empty polyline
+
+    drawingObj.polylines.val = newPolylines;
   });
 }
 
