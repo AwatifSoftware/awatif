@@ -10,7 +10,7 @@ import {
 import { mesh } from "awatif-mesh";
 import { subtract, divide, add, multiply, column } from "mathjs";
 
-export function meshing(building: Building): Structure {
+export function meshing(building: Building, frameMeshDensity: number = 3): Structure {
   const nodesState: State<Node[]> = van.state([]);
   const elementsState: State<Element[]> = van.state([]);
   const analysisInputsState: State<AnalysisInputs> = van.state({});
@@ -77,7 +77,7 @@ export function meshing(building: Building): Structure {
           columnTopNode,
           columnBottomNode,
           nodesState.val.length,
-          3 // mesh density
+          frameMeshDensity
         );
 
         nodesState.val = [...nodesState.val, ...columnNodes];
@@ -109,10 +109,10 @@ function meshMember(
   let elements: Element[] = [];
 
   const vecMember = subtract(node2, node1);
-  const vecMesh = divide(vecMember, meshDensity);
+  const vecSegment = divide(vecMember, meshDensity);
 
   for (let i = 0; i < meshDensity; i++) {
-    nodes.push(add(node1, multiply(vecMesh, i + 1)) as Node);
+    nodes.push(add(node1, multiply(vecSegment, i + 1)) as Node);
     elements.push([startIndex + i, startIndex + i + 1]);
   }
 
