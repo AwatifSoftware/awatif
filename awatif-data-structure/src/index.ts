@@ -1,58 +1,68 @@
 import { State } from "vanjs-core";
+import { TemplateResult } from "lit-html";
+
+
+
+
+// Analytical Model
+export type Structure = {
+  nodes?: State<Node[]>;
+  elements?: State<Element[]>;
+  nodeInputs?: State<NodeInputs>;
+  elementInputs?: State<ElementInputs>;
+  deformOutputs?: State<DeformOutputs>;
+  analyzeOutputs?: State<AnalyzeOutputs>;
+};
 
 // The geometry of any structure can be represented by these two entities:
 export type Node = [number, number, number]; // position coordinates [x,y,z]
 export type Element = number[]; // indices of the first and second node in the list of nodes
 
-// Analysis Inputs
-export type AnalysisInputs = {
-  materials?: Map<number, MaterialInput>;
-  sections?: Map<number, SectionInput>;
-  pointSupports?: Map<
+
+
+
+export type NodeInputs = {
+  supports?: Map<
     number,
     [boolean, boolean, boolean, boolean, boolean, boolean]
   >;
-  pointLoads?: Map<number, [number, number, number, number, number, number]>;
+  loads?: Map<number, [number, number, number, number, number, number]>;
 };
 
-export type MaterialInput = {
-  elasticity: number; // Young's modulus E
-  shearModulus?: number; // Shear modulus G
-  poisson?: number; // Poisson's ratio ν
-  density?: number; // Material density (optional)
+
+
+export type ElementInputs = {
+  elasticities?: Map<number, number>;
+  shearModuli?: Map<number, number>;
+  areas?: Map<number, number>;
+  momentsOfInertiaZ?: Map<number, number>;
+  momentsOfInertiaY?: Map<number, number>;
+  torsionalConstants?: Map<number, number>;
+  poissonRatios?: Map<number, number>;
+  thicknesses?: Map<number, number>;
+
 };
 
-export type SectionInput = {
-  area?: number;
-  momentOfInertiaZ?: number;
-  momentOfInertiaY?: number;
-  torsionalConstant?: number;
-  thickness?: number; // Plate thickness t
+
+
+
+
+export type DeformOutputs = {
+  deformations?: Map<number, [number, number, number, number, number, number]>;
+  reactions?: Map<number, [number, number, number, number, number, number]>;
 };
 
-// Analysis Outputs
-export type AnalysisOutputs = {
-  nodes?: Map<number, NodeAnalysisOutputs>;
-  elements?: Map<number, ElementAnalysisOutputs>;
+
+
+export type AnalyzeOutputs = {
+  normals?: Map<number, [number, number]>;
+  shearsY?: Map<number, [number, number]>;
+  shearsZ?: Map<number, [number, number]>;
+  torsions?: Map<number, [number, number]>;
+  bendingsY?: Map<number, [number, number]>;
+  bendingsZ?: Map<number, [number, number]>;
 };
 
-export type NodeAnalysisOutputs = {
-  deformation?: [number, number, number, number, number, number];
-  reaction?: [number, number, number, number, number, number];
-};
 
-type ElementAnalysisOutputs = {
-  normal?: [number, number];
-  shearY?: [number, number];
-  shearZ?: [number, number];
-  torsion?: [number, number];
-  bendingY?: [number, number];
-  bendingZ?: [number, number];
-};
 
-export type Structure = {
-  nodes?: State<Node[]>;
-  elements?: State<Element[]>;
-  analysisInputs?: State<AnalysisInputs>;
-  analysisOutputs?: State<AnalysisOutputs>;
-};
+

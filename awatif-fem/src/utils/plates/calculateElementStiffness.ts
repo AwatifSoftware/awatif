@@ -2,14 +2,9 @@ import { create, all, MathJsStatic } from 'mathjs';
 
 // Initialize MathJS
 const math: MathJsStatic = create(all);
-
 import { Element } from 'awatif-data-structure';
 import { GaussQuadratureResult, gaussQuadrature } from './gaussQuadrature';
 import { shapeFunctions } from './shapeFunctions';
-import { computeJacobian } from './computeJacobian';
-import { shapeFunctionDerivatives } from './shapeFunctionDerivatives';
-import { plateBending } from './plateBending';
-import { plateShear } from './plateShear';
 import { computeElementForce } from "./computeElementForce"
 
 
@@ -179,4 +174,132 @@ export function calculateElementStiffness(
 let fArray: number[] = (f.valueOf() as number[][]).map(row => row[0]);
 
   return { updatedF: fArray, ke };
+}
+
+
+
+
+
+
+function computeJacobian(
+  nnel: number,
+  dshapedxi: number[],
+  dshapedeta: number[],
+  xcoord: number[],
+  ycoord: number[]
+): { detjacobian: number; invjacobian: number[][] } {
+  // Initialize the Jacobian matrix
+  const jacobianMatrix: number[][] = [
+    [0, 0],
+    [0, 0],
+  ];
+
+  // Assemble the Jacobian matrix
+  for (let i = 0; i < nnel; i++) {
+    jacobianMatrix[0][0] += dshapedxi[i] * xcoord[i];
+    jacobianMatrix[0][1] += dshapedxi[i] * ycoord[i];
+    jacobianMatrix[1][0] += dshapedeta[i] * xcoord[i];
+    jacobianMatrix[1][1] += dshapedeta[i] * ycoord[i];
+  }
+
+  // Compute the determinant of the Jacobian matrix
+  const detjacobian =
+    jacobianMatrix[0][0] * jacobianMatrix[1][1] -
+    jacobianMatrix[0][1] * jacobianMatrix[1][0];
+
+  // Check for singularity
+  if (Math.abs(detjacobian) < Number.EPSILON) {
+    throw new Error(
+      'Jacobian determinant is zero or near zero. Inverse cannot be computed.'
+    );
+  }
+
+  // Compute the inverse of the Jacobian matrix
+  const invdet = 1 / detjacobian;
+
+  const invjacobian: number[][] = [
+    [jacobianMatrix[1][1] * invdet, -jacobianMatrix[0][1] * invdet],
+    [-jacobianMatrix[1][0] * invdet, jacobianMatrix[0][0] * invdet],
+  ];
+
+  return { detjacobian, invjacobian };
+}
+
+
+function plateBending(
+  nnel: number,
+  dshapedx: number[],
+  dshapedy: number[]
+): number[][] {
+  // Initialize pb as a 3 x (nnel * 3) matrix filled with zeros
+  const numRows = 3;
+  const numCols = nnel * 3;
+  const pb: number[][] = Array.from({ length: numRows }, () =>
+    new Array(numCols).fill(0)
+  );
+
+  // Loop over each node
+  for (let i = 0; i < nnel; i++) {
+    const i1 = i * 3;
+    const i2 = i1 + 1;
+    const i3 = i1 + 2;
+
+    pb[0][i2] = -dshapedx[i];
+    pb[1][i3] = -dshapedy[i];
+    pb[2][i2] = -dshapedy[i];
+    pb[2][i3] = -dshapedx[i];
+    pb[2][i1] = 0;
+  }
+
+  return pb;
+}
+
+
+
+function plateShear(
+  nnel: number,
+  dshapedx: number[],
+  dshapedy: number[],
+  shape: number[]
+): number[][] {
+  // Initialize ps as a 2 x (nnel * 3) matrix filled with zeros
+  const numRows = 2;
+  const numCols = nnel * 3;
+  const ps: number[][] = Array.from({ length: numRows }, () =>
+    new Array(numCols).fill(0)
+  );
+
+  // Loop over each node
+  for (let i = 0; i < nnel; i++) {
+    const i1 = i * 3;
+    const i2 = i1 + 1;
+    const i3 = i1 + 2;
+
+    ps[0][i1] = dshapedx[i];
+    ps[1][i1] = dshapedy[i];
+    ps[0][i2] = -shape[i];
+    ps[1][i3] = -shape[i];
+  }
+
+  return ps;
+}
+
+
+function shapeFunctionDerivatives(
+  nnel: number,
+  dshapedxi: number[],
+  dshapedeta: number[],
+  invjacob: number[][]
+): { dshapedx: number[]; dshapedy: number[] } {
+  // Initialize arrays for derivatives
+  const dshapedx: number[] = new Array(nnel);
+  const dshapedy: number[] = new Array(nnel);
+
+  // Compute derivatives for each node
+  for (let i = 0; i < nnel; i++) {
+    dshapedx[i] = invjacob[0][0] * dshapedxi[i] + invjacob[0][1] * dshapedeta[i];
+    dshapedy[i] = invjacob[1][0] * dshapedxi[i] + invjacob[1][1] * dshapedeta[i];
+  }
+
+  return { dshapedx, dshapedy };
 }

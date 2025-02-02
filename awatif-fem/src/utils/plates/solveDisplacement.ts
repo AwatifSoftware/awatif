@@ -1,28 +1,43 @@
 import { create, all, MathJsStatic } from 'mathjs';
-import { AnalysisOutputs, NodeAnalysisOutputs } from 'awatif-data-structure';
+import { DeformOutputs } from 'awatif-data-structure'; // New type with deformations and reactions maps
 
 // Initialize MathJS
 const math: MathJsStatic = create(all);
 
-
-export function solveDisplacement(stiffness: math.Matrix, force: number[], nnodes: number): AnalysisOutputs {
-  // Solve the system of equations stiffness * displacement = force
+/**
+ * Solves the displacement equation (stiffness * displacement = force) 
+ * and maps the computed displacements to node deformations.
+ *
+ * @param stiffness - The stiffness matrix (as a mathjs Matrix)
+ * @param force - The global force vector (flat array of numbers)
+ * @param nnodes - The number of nodes in the structure
+ * @returns A DeformOutputs object containing a map of node deformations
+ */
+export function solveDisplacement(
+  stiffness: math.Matrix,
+  force: number[],
+  nnodes: number
+): DeformOutputs {
+  // Solve the system: stiffness * displacement = force
   const displacement = math.lusolve(stiffness, math.matrix(force));
 
-   // Convert displacement to a flat array
-   const displacementArray = displacement.valueOf() as number[][];
-   const flattenedDisplacements = displacementArray.map(row => row[0]);
+  // Convert the solution to a flat array.
+  // Assuming math.lusolve returns a 2D array (column vector) where each row has one number.
+  const displacementArray = displacement.valueOf() as number[][];
+  const flattenedDisplacements = displacementArray.map(row => row[0]);
 
-  // Map displacements to nodes
-  const nodesOutputMap = new Map<number, NodeAnalysisOutputs>()
+  // Create a Map to store the deformation for each node.
+  // In the new structure, each node’s deformation is a 6-tuple.
+  const deformations = new Map<number, [number, number, number, number, number, number]>();
 
-  const ndof = 3; // Degrees of freedom per node
- 
+  const ndof = 3; // Active degrees of freedom per node (here, we compute only 3 values)
 
   for (let i = 0; i < nnodes; i++) {
     const dofStartIndex = i * ndof;
-
-  // Extract the first three displacement values for the node
+    
+    // Build a 6-entry array for the node:
+    // We insert two zeros at the beginning and one zero at the end,
+    // placing the three computed displacement values in the middle.
     const deformationValues = [
       0,
       0,
@@ -32,30 +47,15 @@ export function solveDisplacement(stiffness: math.Matrix, force: number[], nnode
       0,
     ] as [number, number, number, number, number, number];
 
-    
-    // Create the NodeAnalysisOutputs object
-      const nodeOutput: NodeAnalysisOutputs = {
-        deformation: deformationValues,
-      
-      };
-  
-      // Add to the nodes map
-      nodesOutputMap.set(i, nodeOutput);
-
+    deformations.set(i, deformationValues);
   }
 
-    // Assemble the AnalysisOutputs object
-    const analysisOutputs: AnalysisOutputs = {
-      nodes: nodesOutputMap,
-      
-    };
+  // Create the DeformOutputs object.
+  // Here, we assign the computed deformations and initialize reactions with an empty map.
+  const deformOutputs: DeformOutputs = {
+    deformations: deformations,
+    reactions: new Map<number, [number, number, number, number, number, number]>()
+  };
 
-    console.log("test");
-  
-
-    return analysisOutputs;
-
-
+  return deformOutputs;
 }
-
-

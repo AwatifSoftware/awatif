@@ -1,7 +1,7 @@
-import { QuadrilateralElement } from "awatif-data-structure";
+import { Element } from "awatif-data-structure";
 
 
-export function elementDOF(element: QuadrilateralElement, ndof: number): number[] {
+export function elementDOF(element: Element, ndof: number): number[] {
   const index: number[] = [];
 
   for (const node of element) {
