@@ -24,6 +24,7 @@ export default defineConfig({
         sheets: "src/sheets/index.html",
         "2d-mesh": "src/2d-mesh/index.html",
         drawing: "src/drawing/index.html",
+        report: "src/report/index.html",
       },
     },
   },

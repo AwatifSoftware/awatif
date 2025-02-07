@@ -1,0 +1,49 @@
+.topBar {
+  position: absolute;
+  top: 0.3rem;
+  right: 1rem;
+}
+
+.topBar a {
+  text-decoration: none;
+  color: white;
+}
+
+canvas {
+  position: absolute;
+}
+
+dialog {
+  position: fixed;
+  z-index: 2;
+  overflow: auto;
+  width: calc(100% - 292px - 3rem);
+  height: calc(100% - 3rem);
+  margin: 2rem 1rem 0;
+  padding: 0;
+}
+
+@media only screen and (max-width: 600px) {
+  dialog {
+    width: calc(100% - 2rem);
+    height: calc(70%);
+  }
+}
+
+dialog .close {
+  color: #000000;
+  float: right;
+  margin-top: -5px;
+  font-size: 25px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.dialog-header {
+  background: lightgray;
+  padding: 15px;
+}
+
+.dialog-body {
+  padding: 0 15px;
+}

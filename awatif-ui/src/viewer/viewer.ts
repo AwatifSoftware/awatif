@@ -19,6 +19,8 @@ import { nodeResults } from "./objects/nodeResults";
 
 import "./styles.css";
 import { drawing, Drawing } from "./drawing/drawing";
+import { TemplateResult } from "lit-html";
+import { report } from "./report/report";
 
 export type SettingsObj = {
   gridSize?: number;
@@ -41,11 +43,16 @@ export function viewer({
   settingsObj,
   objects3D,
   drawingObj,
+  reportObj,
 }: {
   structure?: Structure;
   settingsObj?: SettingsObj;
   objects3D?: State<THREE.Object3D[]>;
   drawingObj?: Drawing;
+  reportObj?: {
+    template: (data: State<object>) => TemplateResult;
+    data: State<object>;
+  };
 }): HTMLDivElement {
   // init
   THREE.Object3D.DEFAULT_UP = new THREE.Vector3(0, 0, 1);
@@ -117,6 +124,8 @@ export function viewer({
       derivedDisplayScale,
       viewerRender,
     });
+
+  if (reportObj) viewerElm.append(report(reportObj));
 
   // on size change
   const resizeObserver = new ResizeObserver((entries) => {

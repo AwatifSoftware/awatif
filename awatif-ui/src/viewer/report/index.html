@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Awatif UI - Viewer</title>
+    <script type="module">
+      import { report } from "./report";
+      import { html } from "lit-html";
+      import van from "vanjs-core";
+
+      const nodes = van.state([0, 0, 1]);
+
+      const template = (nodes) => {
+        return html`<p>Number of nodes: ${nodes.val.length}</p>`;
+      };
+
+      setTimeout(() => {
+        nodes.val = [];
+      }, 2000);
+
+      const reportElm = report({
+        template,
+        data: nodes,
+      });
+
+      document.body.appendChild(reportElm);
+    </script>
+  </head>
+  <body></body>
+</html>
