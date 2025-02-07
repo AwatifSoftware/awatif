@@ -2,18 +2,6 @@ import { State } from "vanjs-core";
 import { TemplateResult } from "lit-html";
 
 
-
-
-// Analytical Model
-export type Structure = {
-  nodes?: State<Node[]>;
-  elements?: State<Element[]>;
-  nodeInputs?: State<NodeInputs>;
-  elementInputs?: State<ElementInputs>;
-  deformOutputs?: State<DeformOutputs>;
-  analyzeOutputs?: State<AnalyzeOutputs>;
-};
-
 // Analytical Model
 export type Structure = {
   nodes?: State<Node[]>;
