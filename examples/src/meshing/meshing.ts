@@ -8,24 +8,36 @@ import {
   Building,
 } from "awatif-data-structure";
 import { mesh } from "awatif-mesh";
-import { subtract, divide, add, multiply, column } from "mathjs";
+import { subtract, divide, add, multiply, column, cross, norm } from "mathjs";
 
-export function meshing(building: Building, frameMeshDensity: number = 3): Structure {
+export function meshing(
+  building: Building,
+  frameMeshDensity: number = 3
+): Structure {
   const nodesState: State<Node[]> = van.state([]);
   const elementsState: State<Element[]> = van.state([]);
-  const analysisInputsState: State<AnalysisInputs> = van.state({});
-  const analysisOutputsState: State<AnalysisOutputs> = van.state({});
+  const analysisInputsState: State<AnalysisInputs> = van.state({
+    materials: new Map(),
+    sections: new Map(),
+    pointSupports: new Map(),
+    pointLoads: new Map(),
+  });
+  const analysisOutputsState: State<AnalysisOutputs> = van.state({
+    nodes: new Map(),
+    elements: new Map(),
+  });
 
   // slabs
   van.derive(() => {
     for (let story in building.stories.val) {
+      // slab geometry --------------------------------
       const pointIndex = building.stories.val[story];
       const elevation = building.points.val[pointIndex][2];
       const slabsIndices: number[] = building.slabsByStory.val.get(
         Number(story)
       );
-      slabsIndices.forEach((i) => {
-        const slab: number[] = building.slabs.val[i];
+      slabsIndices.forEach((slabIndex) => {
+        const slab: number[] = building.slabs.val[slabIndex];
         const points = van.state(
           slab.map((s) => [
             building.points.val[s][0],
@@ -36,15 +48,27 @@ export function meshing(building: Building, frameMeshDensity: number = 3): Struc
         const { nodes, elements } = mesh({ points, polygon });
 
         const numExistingNodes = nodesState.val.length;
+        const newNodesIndices = nodes.val.map((_, i) => i + numExistingNodes);
+        const slabElements = elements.val.map((e) =>
+          e.map((i) => i + numExistingNodes)
+        );
 
         nodesState.val = [
           ...nodesState.val,
-          ...meshNodesTo3d(nodes.val, elevation),
+          ...convertMeshNodesTo3d(nodes.val, elevation),
         ];
-        elementsState.val = [
-          ...elementsState.val,
-          ...elements.val.map((e) => e.map((i) => i + numExistingNodes)),
-        ];
+        elementsState.val = [...elementsState.val, ...slabElements];
+
+        // slab loads ----------------------------------------------------------------
+        const areaLoad =
+          building.slabData.val.get(slabIndex)["analysisInput"].areaLoad;
+        analysisInputsState.val = getNodalLoadsFromSlabAreaLoad(
+          nodesState.val,
+          slabElements,
+          analysisInputsState.val,
+          areaLoad,
+          newNodesIndices
+        );
       });
     }
   });
@@ -95,7 +119,7 @@ export function meshing(building: Building, frameMeshDensity: number = 3): Struc
 }
 
 // Utils ---------------------------------------
-function meshNodesTo3d(nodes: Node[], elevation: number): Node[] {
+function convertMeshNodesTo3d(nodes: Node[], elevation: number): Node[] {
   return nodes.map((p) => [p[0], p[2], elevation]);
 }
 
@@ -117,4 +141,40 @@ function meshMember(
   }
 
   return { nodes: nodes, elements: elements };
+}
+
+function getNodalLoadsFromSlabAreaLoad(
+  nodes: Node[],
+  storySlabElements: Element[],
+  analysisInputs: AnalysisInputs,
+  areaLoad: number,
+  slabsNodeIndices: number[]
+): AnalysisInputs {
+  analysisInputs = structuredClone(analysisInputs);
+  // 1. iterate over elements
+  storySlabElements.forEach((e) => {
+    const elementArea = getTriangleArea(nodes[e[0]], nodes[e[1]], nodes[e[2]]);
+    const nodalLoad = (areaLoad * elementArea) / 3;
+    e.forEach((n) => {
+      if (slabsNodeIndices.includes(n)) {
+        if (analysisInputs.pointLoads.has(n)) {
+          analysisInputs.pointLoads.set(
+            n,
+            add(analysisInputs.pointLoads.get(n), [0, 0, -nodalLoad, 0, 0, 0])
+          );
+        } else {
+          analysisInputs.pointLoads.set(n, [0, 0, -nodalLoad, 0, 0, 0]);
+        }
+      }
+    });
+  });
+
+  return analysisInputs;
+}
+
+function getTriangleArea(n1: Node, n2: Node, n3: Node): number {
+  const a = subtract(n2, n1);
+  const b = subtract(n3, n1);
+
+  return (norm(cross(a, b)) as number) / 2;
 }

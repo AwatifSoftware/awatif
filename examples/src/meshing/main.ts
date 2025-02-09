@@ -45,8 +45,24 @@ const building: Building = {
   ),
   slabData: van.state(
     new Map([
-      [0, {}],
-      [1, {}],
+      [
+        0,
+        {
+          analysisInput: {
+            areaLoad: 20,
+            isOpening: false,
+          },
+        },
+      ],
+      [
+        1,
+        {
+          analysisInput: {
+            areaLoad: 20,
+            isOpening: false,
+          },
+        },
+      ],
     ])
   ),
 };
