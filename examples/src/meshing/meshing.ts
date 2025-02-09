@@ -153,18 +153,23 @@ function getNodalLoadsFromSlabAreaLoad(
   analysisInputs = structuredClone(analysisInputs);
   // 1. iterate over elements
   storySlabElements.forEach((e) => {
-    const elementArea = getTriangleArea(nodes[e[0]], nodes[e[1]], nodes[e[2]]);
+    const [n1, n2, n3] = e.map((i) => nodes[i]);
+    const elementArea = getTriangleArea(n1, n2, n3);
     const nodalLoad = (areaLoad * elementArea) / 3;
     e.forEach((n) => {
       if (slabsNodeIndices.includes(n)) {
-        if (analysisInputs.pointLoads.has(n)) {
-          analysisInputs.pointLoads.set(
-            n,
-            add(analysisInputs.pointLoads.get(n), [0, 0, -nodalLoad, 0, 0, 0])
-          );
-        } else {
-          analysisInputs.pointLoads.set(n, [0, 0, -nodalLoad, 0, 0, 0]);
-        }
+        const loadVector = [0, 0, -nodalLoad, 0, 0, 0] as [
+          number,
+          number,
+          number,
+          number,
+          number,
+          number
+        ];
+        const existingLoad = analysisInputs.pointLoads.get(n) ?? [
+          0, 0, 0, 0, 0, 0,
+        ];
+        analysisInputs.pointLoads.set(n, add(existingLoad, loadVector));
       }
     });
   });
