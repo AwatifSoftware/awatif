@@ -1,0 +1,7 @@
+#toolbar {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  width: 150px;
+  z-index: 2; /* On top of the viewer */
+}

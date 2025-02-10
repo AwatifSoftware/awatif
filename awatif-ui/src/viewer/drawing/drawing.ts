@@ -73,6 +73,8 @@ export function drawing({
   // Events
   // On gridTarget change, interpolate grid and update plane position and rotation
   van.derive(() => {
+    if (!drawingObj.gridTarget) return;
+
     interpolate(
       gridObj,
       {
@@ -287,6 +289,8 @@ export function drawing({
     const newPoints = [...drawingObj.points.rawVal];
     newPoints.splice(intersectWithPoints[0].index, 1);
     drawingObj.points.val = newPoints;
+
+    if (!drawingObj.polylines) return;
 
     const newPolylines = drawingObj.polylines.rawVal
       .map((polyline) =>

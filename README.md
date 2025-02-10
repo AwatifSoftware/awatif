@@ -22,7 +22,7 @@ Awatif.co helps you build parametric structural engineering apps that run on the
 
 ## Stack 
 1. **VanJS**: for handling reactive state [Docs](https://vanjs.org/)
-2. **Three.js**: for 3D rendering and operations [Docs](https://threejs.org/)
+2. **Three.js**: for 3D rendering and math operations [Docs](https://threejs.org/)
 3. **Lit-html**: for templating [Docs](https://lit.dev/docs/libraries/standalone-templates/)
 4. **W2UI**: for UI components [Docs](https://w2ui.com/web/home)
 
