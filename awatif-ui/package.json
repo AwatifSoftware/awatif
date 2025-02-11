@@ -25,6 +25,9 @@
   },
   "dependencies": {
     "awatif-data-structure": "^1.0.0",
+    "html2canvas": "^1.4.1",
+    "html2pdf.js": "^0.10.2",
+    "jspdf": "^2.5.2",
     "lit-html": "^3.2.1",
     "three": "~0.169.0",
     "tweakpane": "~4.0.4",

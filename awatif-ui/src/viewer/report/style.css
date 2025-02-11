@@ -47,3 +47,49 @@ dialog .close {
 .dialog-body {
   padding: 0 15px;
 }
+
+.print-button {
+  position: absolute;
+  top: 140px;
+  right: 25px;
+  width: 60px;
+  height: 30px;
+  color: #fefafa;
+  background-color: #2e5368; /* Light red background */
+  border-radius: 10px;
+  font-family: "Arial", sans-serif; /* Set font family */
+  display: flex;
+  font-size: 13px;
+  align-items: center;
+  justify-content: center; /* Center text */
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.2s;
+}
+
+.report-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 80px;
+  height: 40px;
+  color: #fefafa;
+  background-color: #2e5368; /* Light red background */
+  border-radius: 10px;
+  font-family: "Arial", sans-serif; /* Set font family */
+  display: flex;
+  font-size: 13px;
+  align-items: center;
+  justify-content: center; /* Center text */
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.2s;
+}
+
+.report-button:hover {
+  background-color: #333333; /* Darker red on hover */
+  color: #fff;
+}
+
+.report-button:active {
+  transform: scale(0.95);
+}
+
