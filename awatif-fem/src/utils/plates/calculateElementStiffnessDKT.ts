@@ -38,7 +38,7 @@ export function DKTElementKMatrix(
   
     for (const [k, e, w] of gaussPoints) {
       // build B at (k,e)
-      const B = buildBMatrix_teefemStyle(k, e, x1,y1, x2,y2, x3,y3);
+      const B = buildBMatrix(k, e, x1,y1, x2,y2, x3,y3);
       const Bt = math.transpose(B) as Matrix;
   
       const factor = 2*A*w; // "2A" because the reference triangle has area=1/2
@@ -200,7 +200,7 @@ function buildHye(
 
 
 
-  function buildBMatrix_teefemStyle(
+  function buildBMatrix(
     k: number, e: number,
     x1: number, y1: number,
     x2: number, y2: number,
