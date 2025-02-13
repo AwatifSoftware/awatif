@@ -42,7 +42,7 @@ export function mesh({
       subdivisions: 0,
     });
 
-    nodes.val = subPoints.map((p) => [p[0], 0, p[1]]);
+    nodes.val = subPoints.map((p) => [p[0], p[1], 0]);
     elements.val = subFaces;
 
     triangle.freeIO(input, true);
