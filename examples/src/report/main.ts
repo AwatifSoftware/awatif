@@ -81,6 +81,10 @@ const indexBars = Array.from({ length: noBars }, (_, i) => i);
 
 
 const template: (nodes: Structure["nodes"]) => TemplateResult = (nodes) => {
+  
+  const options = { day: "numeric", month: "long", year: "numeric" };
+  document.getElementById("reportDate").textContent = new Date().toLocaleDateString("en-US", options);
+
   return html`
   <br>
   <header class="header">
@@ -229,7 +233,3 @@ document.body.append(
     },
   })
 );
-
-const options = { day: "numeric", month: "long", year: "numeric" };
-document.getElementById("reportDate").textContent = new Date().toLocaleDateString("en-US", options);
-

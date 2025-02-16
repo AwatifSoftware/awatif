@@ -1,0 +1,385 @@
+/* ==========================
+   General Styles
+   ========================== */
+
+   body {
+    font-family: "Arial", sans-serif;
+    color: #28292e;
+  }
+  
+  /* ==========================
+     Typography
+     ========================== */
+  
+  h1 {
+    font-family: "Times", sans-serif;
+    font-size: 26px;
+    font-weight:200;
+    color: #2e5368;
+    margin-bottom: 0px;
+    margin-top: 2px;
+    margin-left: 10px;
+  }
+  
+  h2 {
+    font-family: "Times", sans-serif;
+    font-size: 24px;
+    font-weight:200;
+    color: #2e5368;
+    margin: 0px 0;
+    margin-left: 10px;
+  }
+  
+  h3 {
+    font-size: 15px;
+    color: #2e5368;
+    margin-left: 10px;
+    margin-top: 16px;
+
+  }
+  
+  h4 {
+    font-size: 14px;
+    color: #000000;
+    margin-top: 4px;
+    margin-bottom: 4px;
+    margin-left: 10px;
+  }
+  
+  .header-h1 {
+    font-family: "Arial", sans-serif;
+    font-size: 20px;
+    font-weight: bold;
+    color: #2e5368;
+    margin: 0px 0;
+    margin-left: 0px;
+  }
+
+  .header-h2 {
+    font-family: "Arial", sans-serif;
+    font-size: 14px;
+    font-weight: bold;
+    color: #000000;
+    margin: 0px 0;
+    margin-left: 0px;
+  }
+
+  .header-h3 {
+    font-family: "Arial", sans-serif;
+    font-size: 12px;
+    font-weight: 200;
+    color: #000000;
+    margin: 0px 0;
+    margin-left: 0px;
+  }
+  
+  
+  .p1 {
+    font-size: 14px;
+    margin-left: 10px;
+  }
+  
+  /* ==========================
+     Header Section
+     ========================== */
+  
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    background-color: #f4f4f4;
+  }
+  
+  .header-left h1 {
+    margin: 0;
+    font-size: 24px;
+  }
+  
+  .header-right {
+    display: flex;
+    align-items: center;
+  }
+  
+  .header-right .info {
+    font-size: 12px;
+    display: flex;
+    flex-direction: column;
+    text-align: right;
+    margin-right: 20px;
+  }
+  
+  .headerLogo {
+    height: 10px;
+    width: auto;
+  }
+  
+  /* ==========================
+     Tables
+     ========================== */
+  
+  table {
+    font-family: "Arial";
+    border-collapse: collapse;
+    border: 1px solid rgb(0, 0, 0);
+    font-size: 11px;
+    margin-left: 10px;
+    width: 600px; /* Set a fixed width (adjust as needed) */
+  }
+  
+  th {
+    border: 1px solid rgb(188, 188, 188);
+    padding: 8px;
+    background-color: rgb(225, 225, 225);
+    font-size: 12px;
+    text-align: center; /* Centers text horizontally */
+  }
+  
+  td {
+    border: 1px solid rgb(188, 188, 188);
+    padding: 8px;
+    font-size: 12px;
+    font-size: 12px;
+    text-align: center; /* Centers text horizontally */
+  }
+  
+  .custom-cell {
+    border: 1px solid rgb(0, 0, 0);
+    padding: 8px;
+    font-size: 12px;
+    margin-left: 10px;
+  }
+  
+  /* Style for the second header row */
+  #data-table tr:nth-child(2) th {
+    font-style: italic;
+    background-color: #f0f0f0;
+    font-weight: normal;
+  }
+
+  /* General table styling */
+  .table-design {
+    font-family: "Arial";
+    border-collapse: collapse;
+    border: 1px solid rgb(0, 0, 0);
+    font-size: 11px;
+    margin-left: 10px;
+    width: 100%; /* Table adjusts to the container's width */
+    table-layout: fixed; /* Enables fixed-width columns */
+
+    }
+
+  /* Header styling */
+  .table-design th {
+    border: 1px solid rgb(188, 188, 188);
+    padding: 8px;
+    background-color: rgb(225, 225, 225);
+    font-size: 12px;
+    text-align: left; /* Centers text horizontally */
+  }
+
+  /* Table data cell styling */
+  .table-design td {
+    border: 1px solid rgb(188, 188, 188);
+    padding: 8px;
+    font-size: 12px;
+    font-size: 12px;
+    text-align: center; /* Centers text horizontally */
+  }
+
+  /* Style for the second header row */
+  #table-design tr:nth-child(2) th {
+    font-style: italic;
+    background-color: #f0f0f0;
+    font-weight: normal;
+  }
+
+
+
+
+  
+  /* ==========================
+     Dropdowns & Forms
+     ========================== */
+  
+  label {
+    color: #333;
+    margin-left: 10px;
+    display: block;
+    margin-bottom: 5px;
+  }
+  
+  #columnSelect {
+    margin-left: 10px;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 12px;
+    background-color: white;
+    cursor: pointer;
+    transition: border-color 0.3s ease-in-out;
+  }
+  
+  #columnSelect:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+  }
+  
+  /* ==========================
+     Collapsible Sections
+     ========================== */
+  
+  .collapsible {
+    background-color: #efefef;
+    font-weight: bold;
+    font-size: 15px;
+    cursor: pointer;
+    padding: 12px 10px;
+    width: 100%;
+    border: 1px solid #c4c4c4;
+    text-align: left;
+    outline: none;
+    border-radius: 5px;
+    transition: background-color 0.4s;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .collapsible:hover {
+    background-color: #ffffff;
+  }
+  
+  .collapsible::after {
+    content: "\25BC"; /* Downward arrow */
+    font-size: 12px;
+    color: #2e5368;
+    transition: transform 0.2s ease;
+  }
+  
+  .collapsible.active::after {
+    transform: rotate(180deg); /* Rotates the arrow upward */
+  }
+  
+  .collapsible.active {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+  
+  .content {
+    padding: 20px;
+    display: none;
+    overflow: hidden;
+    background-color: #ffffff;
+    border: 1px solid #c4c4c4;
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+  }
+  
+  /* ==========================
+     Text Styling
+     ========================== */
+  
+  .math {
+    font-family: "KaTeX_Main", "Times New Roman", serif;
+    font-size: 14px;
+    display: inline-block;
+    vertical-align: middle;
+    margin-left: 10px;
+  }
+  
+  .bolt {
+    font-weight: bold;
+    font-size: 12px;
+    color: #28292e;
+    margin: 2px 0;
+  }
+  
+  .normal {
+    color: #28292e;
+    font-size: 14px;
+    margin: 2px 0;
+  }
+  
+  .text {
+    color: #28292e;
+    font-size: 14px;
+    margin: 2px 0;
+    margin-left: 10px;
+  }
+
+  .bolttext {
+    color: #28292e;
+    font-weight: bold;
+    font-size: 14px;
+    margin: 2px 0;
+    margin-left: 10px;
+  }
+  
+  .explanation {
+    font-family: "Arial";
+    font-size: 12px; /* Adjust size */
+    color: #666;     /* Example color */
+    margin-left: 5px;
+  }
+
+  .caption {
+    font-family: "Arial";
+    font-size: 13px; /* Adjust size */
+    color: #666;     /* Example color */
+    margin-left: 10px;
+    margin-top: 2px;
+    font-style: italic;
+  }
+  
+  .geometry-container {
+    display: flex;
+    justify-content: space-between;
+  }
+  
+  .column {
+    flex: 1;
+    margin-right: 2px; /* Decrease the space between columns */
+  }
+
+  .column:last-child {
+      margin-right: 0;
+  }
+
+
+  .tab {
+    padding-left: 20px; /* Adjust the value as needed */
+  }
+
+  strong {
+    color: #28292e;
+    font-size: 14px;
+    margin-left: 10px;
+  }
+
+    /* Style for the unordered list (ul) */
+  ul {
+    list-style-type: disc; /* Adds bullets before list items */
+    padding-left: 30px; /* Adds space between the bullet and text */
+    font-family: Arial, sans-serif; /* Sets a clean font */
+    color: #333; /* Sets text color */
+  }
+
+  /* Style for each list item (li) */
+  li {
+    font-size: 14px; /* Sets the font size for list items */
+    margin-bottom: 10px; /* Adds space between list items */
+  }
+
+  /* Optional: Style for the <p> tag inside the <li> */
+  li p {
+    display: inline; /* Makes the <p> content inline, so it doesn’t break the line */
+    font-weight: bold; /* Makes the clause bold */
+    color: #007bff; /* Changes text color to blue for emphasis */
+  }
+
+  
+
+  
+  
