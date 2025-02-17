@@ -13,6 +13,7 @@ export function sheets({
     {
       text: string;
       fields: object[];
+      units: State<Data>;
       data: State<Data>;
     }
   >;
@@ -20,17 +21,20 @@ export function sheets({
 }): HTMLElement {
   const sheetsElm = document.createElement("div");
   const tabsElm = document.createElement("div");
+  const contentWrapper = document.createElement("div"); // Wrapper for grids
 
+  // Create tabs and grids
   const tabsData = [];
   const grids = new Map<string, HTMLDivElement>();
   sheets.forEach((sheet, index) => {
     tabsData.push({ id: index, text: sheet.text });
     grids.set(
       index,
-      grid({ fields: sheet.fields, data: sheet.data, onChange: onGridChange })
+      grid({ fields: sheet.fields, data: sheet.data, units: sheet.units, onChange: onGridChange })
     );
   });
 
+  // Create W2UI tabs
   const tabs = new w2tabs({
     box: tabsElm,
     name: "tabs",
@@ -39,17 +43,22 @@ export function sheets({
     tabs: tabsData,
   });
 
-  // update
+  // Set IDs and append elements
   sheetsElm.id = "sheets";
   tabsElm.id = "tabs";
+  contentWrapper.id = "content-wrapper"; // Wrapper for dynamic content
+  contentWrapper.append(grids.values().next().value); // Add the first grid to wrapper
+  sheetsElm.append(contentWrapper, tabsElm); // Append wrapper and tabs
 
-  sheetsElm.append(grids.values().next().value, tabsElm);
-
-  // events
+  // Tabs click event
   tabs.onClick = (e: { target: string }) => {
-    sheetsElm.firstChild.replaceWith(grids.get(e.target));
+    const activeGrid = grids.get(e.target);
+    if (activeGrid) {
+      contentWrapper.firstChild.replaceWith(activeGrid);
+    }
   };
 
+  // Grid change callback
   function onGridChange(data: Data) {
     if (onChange) onChange({ sheet: tabs.active, data });
   }

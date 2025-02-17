@@ -1,20 +1,33 @@
-/* Stretching to its container allow size change events */
+/* Sheets container: responsive and adaptive to parent size */
 #sheets {
   position: absolute;
-  top: 0;
+  top: 35px;
   bottom: 0;
   left: 0;
   right: 0;
+  max-width: 100%; /* Optional max-width for large screens */
+  max-height: 100%; /* Optional max-height for large screens */
+  border: 1px solid #ccc; /* Optional border for clarity */
+  border-radius: 8px; /* Optional rounded corners */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Optional shadow for better visibility */
+  overflow: hidden; /* Prevent overflow from breaking layout */
+  background-color: #fff; /* Background color for contrast */
 }
 
+/* Grid inside the sheets container */
 #sheets #grid {
-  bottom: 28px;
+  padding-bottom: 0px; /* Ensure space for tabs */
+  box-sizing: border-box; /* Include padding in dimensions */
+  overflow: auto; /* Allow grid content to scroll if needed */
 }
 
+/* Tabs positioned at the bottom of the sheets container */
 #tabs {
   position: absolute;
   bottom: 0;
   left: 0;
   right: 0;
-  height: 28px;
+  height: 14px;
+  background-color: #f9f9f9; /* Optional background for better contrast */
+  border-top: 1px solid #ddd; /* Optional border for clarity */
 }

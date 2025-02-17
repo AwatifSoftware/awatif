@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Awatif UI - Viewer</title>
+    <script type="module">
+      import { input } from "./input";
+      import { html } from "lit-html";
+      import van from "vanjs-core";
+      import { sheets } from "../../sheets/sheets";
+
+
+      // data 
+      const data = [[0,1,2], [0,2,2], [0,4,2]]
+
+      // sheets
+      const sheetsObj = new Map();
+
+      // sheets
+      const designInputs = van.state([
+        ["Col1", 5, 0.4, 0.3, 2000, 0, 15, 1.0, 1.0],
+        ["Col2", 4.2, 0.5, 0.6, 3000, 20, 0, 1.0, 8.25],
+        ["Col3", 4.2, 0.4, 0.4, 3000, 0, 0, 1.0, 16],
+      ]);
+
+      const slabInputs = van.state([
+        [0.5, 0.5, 0],
+        [16.5, 0.5, 0],
+        [16.5, 16.5, 0],
+      ]);
+
+      // slab inputs
+      sheetsObj.set("slab-Inputs", {
+        text: "Slab",
+        units: ["m", "m"],
+        fields: [
+          { field: "A", text: "xCord", editable: { type: "int" } },
+          { field: "B", text: "yCord", editable: { type: "int" } },
+        ],
+        data: slabInputs,
+      });
+
+      // design inputs
+      sheetsObj.set("design-Inputs", {
+        text: "Columns",
+        fields: [
+          { field: "A", text: "Column", editable: { type: "string" } },
+          { field: "B", text: "Length", editable: { type: "float" } },
+          { field: "C", text: "Width", editable: { type: "float" } },
+          { field: "D", text: "Height", editable: { type: "float" } },
+          { field: "E", text: "Ned", editable: { type: "int" } },
+          { field: "F", text: "Myd", editable: { type: "int" } },
+          { field: "G", text: "Mzd", editable: { type: "int" } },
+          { field: "H", text: "xCord", editable: { type: "float" } },
+          { field: "I", text: "yCord", editable: { type: "float" } },
+        ],
+        data: designInputs,
+      });
+
+      const sheetsElm = sheets({
+        sheets: sheetsObj,
+        onChange: (e) => console.log(e), // test on change
+      });
+
+      const template = (nodes) => {
+        return html`<p>This is an interactive table in a canvas.</p>`;
+      };
+
+      setTimeout(() => {
+        nodes.val = [];
+      }, 2000);
+
+      const inputElm = input({
+        template,
+        sheetsElm,
+        data
+      });
+
+      document.body.appendChild(inputElm);
+    </script>
+  </head>
+  <body></body>
+</html>

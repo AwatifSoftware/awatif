@@ -21,6 +21,7 @@ import "./styles.css";
 import { drawing, Drawing } from "./drawing/drawing";
 import { TemplateResult } from "lit-html";
 import { report } from "./report/report";
+import { input } from "./input/input";
 
 export type SettingsObj = {
   gridSize?: number;
@@ -44,12 +45,17 @@ export function viewer({
   objects3D,
   drawingObj,
   reportObj,
+  inputObj,
 }: {
   structure?: Structure;
   settingsObj?: SettingsObj;
   objects3D?: State<THREE.Object3D[]>;
   drawingObj?: Drawing;
   reportObj?: {
+    template: (data: State<object>) => TemplateResult;
+    data: State<object>;
+  };
+  inputObj?: {
     template: (data: State<object>) => TemplateResult;
     data: State<object>;
   };
@@ -126,6 +132,7 @@ export function viewer({
     });
 
   if (reportObj) viewerElm.append(report(reportObj));
+  if (inputObj) viewerElm.append(input(inputObj));
 
   // on size change
   const resizeObserver = new ResizeObserver((entries) => {
